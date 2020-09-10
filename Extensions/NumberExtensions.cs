@@ -119,6 +119,20 @@ namespace Extensions.Number
 		/// <para>Default: 1E-6.</para></param>
 		public static bool Approx(this double number, double otherNumber, double tolerance = 1E-6) => (number - otherNumber).Abs() <= tolerance;
 
+		/// <summary>
+        /// Returns true if this <paramref name="number"/> is between two bounds, in any order.
+        /// </summary>
+        /// <param name="bound1">First bound.</param>
+        /// <param name="bound2">Second bound.</param>
+		public static bool IsBetween(this double number, double bound1, double bound2) => number > Math.Min(bound1, bound2) && number < Math.Max(bound1, bound2);
+
+		/// <summary>
+        /// Returns true if this <paramref name="number"/> is between two bounds, in any order.
+        /// </summary>
+        /// <param name="bound1">First bound.</param>
+        /// <param name="bound2">Second bound.</param>
+		public static bool IsBetween(this int number, double bound1, double bound2) => number > Math.Min(bound1, bound2) && number < Math.Max(bound1, bound2);
+
         /// <summary>
         /// Convert an <paramref name="angle"/>, in radians, to degrees.
         /// </summary>
