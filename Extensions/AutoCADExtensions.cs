@@ -57,14 +57,16 @@ namespace Extensions.AutoCAD
         /// <param name="fromUnit">The <see cref="LengthUnit"/> of origin.</param>
         /// <param name="toUnit">The <seealso cref="LengthUnit"/> to convert.</param>
         /// <returns></returns>
-        public static Point3d Convert(this Point3d point, LengthUnit fromUnit, LengthUnit toUnit = LengthUnit.Millimeter) => fromUnit == toUnit
-	        ? point
-	        : new Point3d
-				(
-			        UnitConverter.Convert(point.X, fromUnit, toUnit),
-			        UnitConverter.Convert(point.Y, fromUnit, toUnit), 
-			        UnitConverter.Convert(point.Z, fromUnit, toUnit)
-		        );
+        public static Point3d Convert(this Point3d point, LengthUnit fromUnit, LengthUnit toUnit = LengthUnit.Millimeter) => fromUnit == toUnit ? point : new Point3d(point.X.Convert(fromUnit, toUnit), point.Y.Convert(fromUnit, toUnit), point.Z.Convert(fromUnit, toUnit));
+
+		/// <summary>
+        /// Returns true if this <paramref name="point"/> is approximately equal to <paramref name="otherPoint"/>.
+        /// </summary>
+        /// <param name="otherPoint">The other <see cref="Point3d"/> to compare.</param>
+        /// <param name="tolerance">The tolerance to considering equivalent.</param>
+        /// <returns></returns>
+		public static bool Approx(this Point3d point, Point3d otherPoint, double tolerance = 1E-3)
+			=> point.X.Approx(otherPoint.X, tolerance) && point.Y.Approx(otherPoint.Y, tolerance) && point.Z.Approx(otherPoint.Z, tolerance);
 
 		/// <summary>
         /// Return this array of <see cref="Point3d"/> ordered in ascending Y then ascending X.
