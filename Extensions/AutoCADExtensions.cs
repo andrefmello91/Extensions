@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Extensions.Number;
 using MathNet.Numerics;
 using UnitsNet;
 using UnitsNet.Units;
+using static Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace Extensions.AutoCAD
 {
@@ -78,19 +81,57 @@ namespace Extensions.AutoCAD
         /// <summary>
         /// Convert to a <see cref="List{T}"/> of <see cref="Point3d"/>.
         /// </summary>
-        public static List<Point3d> ToList(this Point3dCollection points)
-		{
-			var list = new List<Point3d>();
-
-			foreach (Point3d point in points)
-				list.Add(point);
-
-			return list;
-		}
+        public static List<Point3d> ToList(this Point3dCollection points) => points.Cast<Point3d>().ToList();
 
         /// <summary>
         /// Convert to an <see cref="Array"/> of <see cref="Point3d"/>.
         /// </summary>
         public static Point3d[] ToArray(this Point3dCollection points) => points.ToList().ToArray();
+
+		/// <summary>
+        /// Convert this <paramref name="value"/> to a <see cref="double"/>.
+        /// </summary>
+        public static double ToDouble(this TypedValue value) => System.Convert.ToDouble(value.Value);
+
+		/// <summary>
+        /// Convert this <paramref name="value"/> to an <see cref="int"/>.
+        /// </summary>
+        public static int ToInt(this TypedValue value) => System.Convert.ToInt32(value.Value);
+
+        /// <summary>
+        /// Read a <see cref="DBObject"/> in the drawing from this <see cref="ObjectId"/>.
+        /// </summary>
+        public static DBObject ToDBObject(this ObjectId objectId)
+		{
+			// Start a transaction
+			using (var trans = DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+				// Read the object as a point
+				return trans.GetObject(objectId, OpenMode.ForRead);
+		}
+
+        /// <summary>
+        /// Read a <see cref="Entity"/> in the drawing from this <see cref="ObjectId"/>.
+        /// </summary>
+        public static Entity ToEntity(this ObjectId objectId) => (Entity) objectId.ToDBObject();
+
+        /// <summary>
+        /// Read this <see cref="DBObject"/>'s XData as an <see cref="Array"/> of <see cref="TypedValue"/>.
+        /// </summary>
+        /// <param name="appName">The application name.</param>
+        public static TypedValue[] ReadXData(this DBObject dbObject, string appName) => dbObject.GetXDataForApplication(appName).AsArray();
+
+        /// <summary>
+        /// Read this <see cref="ObjectId"/>'s XData as an <see cref="Array"/> of <see cref="TypedValue"/>.
+        /// </summary>
+        /// <param name="appName">The application name.</param>
+        public static TypedValue[] ReadXData(ObjectId objectId, string appName)
+        {
+	        // Start a transaction
+	        using (var trans = DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+	        {
+		        // Get the NOD in the database
+		        return trans.GetObject(objectId, OpenMode.ForRead).ReadXData(appName);
+	        }
+        }
     }
 }
