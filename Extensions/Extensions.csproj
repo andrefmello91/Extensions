@@ -105,12 +105,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoCADExtensions.cs" />
-    <Compile Include="MatricesAndVectors.cs" />
-    <Compile Include="NumberExtensions.cs" />
+    <Compile Include="Number\MatricesAndVectors.cs" />
+    <Compile Include="Number\UnitConverter.cs" />
+    <Compile Include="Number\Trigonometry.cs" />
+    <Compile Include="Number\NumberExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
