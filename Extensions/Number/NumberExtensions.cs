@@ -86,5 +86,17 @@ namespace Extensions.Number
         /// <param name="bound1">First bound.</param>
         /// <param name="bound2">Second bound.</param>
 		public static bool IsBetween(this int number, double bound1, double bound2) => number > Math.Min(bound1, bound2) && number < Math.Max(bound1, bound2);
+
+		/// <summary>
+		/// Try parse a string and verify if is not zero.
+		/// </summary>
+		/// <param name="numberAsString">String to parse.</param>
+		/// <param name="number">The parsed number.</param>
+		public static bool ParsedAndNotZero(this string numberAsString, out double number)
+		{
+			var parsed = double.TryParse(numberAsString, out number);
+
+			return parsed && !number.ApproxZero();
+		}
     }
 }
