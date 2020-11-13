@@ -98,5 +98,10 @@ namespace Extensions.Number
 
 			return parsed && !number.ApproxZero();
 		}
+
+		/// <summary>
+        /// Returns true if this <paramref name="number"/> is <see cref="double.NaN"/>.
+        /// </summary>
+		public static bool IsNaN(this double number) => double.IsNaN(number);
     }
 }
