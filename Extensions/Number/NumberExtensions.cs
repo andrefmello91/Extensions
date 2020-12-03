@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MathNet.Numerics;
 using UnitsNet;
 using UnitsNet.Units;
@@ -103,5 +105,10 @@ namespace Extensions.Number
         /// Returns true if this <paramref name="number"/> is <see cref="double.NaN"/>.
         /// </summary>
 		public static bool IsNaN(this double number) => double.IsNaN(number);
+
+		/// <summary>
+        /// Returns true if this <paramref name="collection"/> contains at least one <see cref="double.NaN"/>.
+        /// </summary>
+		public static bool ContainsNaN(this IEnumerable<double> collection) => collection.Any(d => d.IsNaN());
     }
 }

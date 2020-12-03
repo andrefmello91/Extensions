@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.LinearAlgebra;
+﻿using Extensions.Number;
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace Extensions.LinearAlgebra
@@ -16,5 +17,10 @@ namespace Extensions.LinearAlgebra
         /// </summary>
         /// <param name="array"></param>
 	    public static Matrix<double> ToMatrix(this double[,] array) => Matrix<double>.Build.DenseOfArray(array);
+
+        /// <summary>
+        /// Returns true if this <paramref name="matrix"/> contains at least one <see cref="double.NaN"/>.
+        /// </summary>
+        public static bool ContainsNaN(this Matrix<double> matrix) => matrix.Exists(d => d.IsNaN());
     }
 }

@@ -8,11 +8,11 @@ namespace Extensions.Number
     public static partial class Extensions
     {
 		/// <summary>
-        /// Convert this <paramref name="force"/> to another <see cref="LengthUnit"/>.
+        /// Convert this <paramref name="length"/> to another <see cref="LengthUnit"/>.
         /// </summary>
         /// <param name="fromUnit">The base <see cref="LengthUnit"/>.</param>
         /// <param name="toUnit">The target <see cref="LengthUnit"/>.</param>
-        public static double Convert(this double force, LengthUnit fromUnit, LengthUnit toUnit = LengthUnit.Millimeter) => fromUnit == toUnit ? force : UnitConverter.Convert(force, fromUnit, toUnit);
+        public static double Convert(this double length, LengthUnit fromUnit, LengthUnit toUnit = LengthUnit.Millimeter) => fromUnit == toUnit ? length : UnitConverter.Convert(length, fromUnit, toUnit);
 
 		/// <summary>
         /// Convert this <paramref name="length"/> to another <see cref="LengthUnit"/>.
@@ -64,7 +64,7 @@ namespace Extensions.Number
         /// </summary>
         /// <param name="fromUnit">The base <see cref="ForceUnit"/>.</param>
         /// <param name="toUnit">The target <see cref="ForceUnit"/>.</param>
-        public static double Convert(this double force, ForceUnit fromUnit, ForceUnit toUnit = ForceUnit.Newton) => fromUnit == toUnit ? force : UnitConverter.Convert(force, fromUnit, toUnit);
+        public static double Convert(this double force, ForceUnit fromUnit, ForceUnit toUnit = ForceUnit.Newton) => force.IsNaN() ? 0 :  fromUnit == toUnit ? force : UnitConverter.Convert(force, fromUnit, toUnit);
 
         /// <summary>
         /// Convert this <paramref name="force"/> to another <see cref="ForceUnit"/>.
@@ -90,7 +90,7 @@ namespace Extensions.Number
         /// </summary>
         /// <param name="fromUnit">The base <see cref="PressureUnit"/>.</param>
         /// <param name="toUnit">The target <see cref="PressureUnit"/>.</param>
-        public static double Convert(this double pressure, PressureUnit fromUnit, PressureUnit toUnit = PressureUnit.Megapascal) => fromUnit == toUnit ? pressure : UnitConverter.Convert(pressure, fromUnit, toUnit);
+        public static double Convert(this double pressure, PressureUnit fromUnit, PressureUnit toUnit = PressureUnit.Megapascal) => pressure.IsNaN() ? 0 : fromUnit == toUnit ? pressure : UnitConverter.Convert(pressure, fromUnit, toUnit);
 
         /// <summary>
         /// Convert this <paramref name="pressure"/> to another <see cref="PressureUnit"/>.
