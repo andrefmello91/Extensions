@@ -38,7 +38,7 @@ namespace Extensions.Number
         /// Returns the cotangent of an <paramref name="angle"/> in radians.
         /// </summary>
         /// <param name="absoluteValue">Return absolute values? (default: false).</param>
-        public static double Cotan(this double angle, bool absoluteValue = false) => 1 / angle.Tan(absoluteValue);
+        public static double Cotan(this double angle, bool absoluteValue = false) => 1.0 / angle.Tan(absoluteValue);
 
         /// <summary>
         /// Returns the arc-cosine of a <paramref name="cosine"/>, in radians.
