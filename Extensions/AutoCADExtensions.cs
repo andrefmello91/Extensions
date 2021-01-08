@@ -142,23 +142,29 @@ namespace Extensions.AutoCAD
         /// <summary>
         /// Read a <see cref="DBObject"/> in the drawing from this <see cref="ObjectId"/>.
         /// </summary>
-        public static DBObject ToDBObject(this ObjectId objectId)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static DBObject ToDBObject(this ObjectId objectId, Transaction ongoingTransaction = null)
         {
 	        if (objectId.IsNull || objectId.IsErased)
 		        return null;
 
-			// Start a transaction
-			var trans = StartTransaction();
+            // Start a transaction
+            var trans = ongoingTransaction ?? StartTransaction();
 
-	        // Read the object as a point
-	        return
-		        trans.GetObject(objectId, OpenMode.ForRead);
-		}
+            // Read the object
+            var obj = trans.GetObject(objectId, OpenMode.ForRead);
+
+            if (ongoingTransaction is null)
+	            trans.Dispose();
+
+            return obj;
+        }
 
         /// <summary>
         /// Read a <see cref="Entity"/> in the drawing from this <see cref="ObjectId"/>.
         /// </summary>
-        public static Entity ToEntity(this ObjectId objectId) => (Entity) objectId.ToDBObject();
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static Entity ToEntity(this ObjectId objectId, Transaction ongoingTransaction = null) => (Entity) objectId.ToDBObject(ongoingTransaction);
 
 		/// <summary>
         /// Get the <see cref="ObjectId"/> related to this <paramref name="handle"/>.
@@ -174,8 +180,8 @@ namespace Extensions.AutoCAD
         /// Return a <see cref="DBObjectCollection"/> from an <see cref="ObjectIdCollection"/>.
         /// </summary>
         /// <param name="collection"></param>
-        /// <returns></returns>
-        public static DBObjectCollection ToDBObjectCollection(this ObjectIdCollection collection)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static DBObjectCollection ToDBObjectCollection(this ObjectIdCollection collection, Transaction ongoingTransaction = null)
         {
 	        if (collection is null)
 		        return null;
@@ -183,13 +189,19 @@ namespace Extensions.AutoCAD
 			var dbCollection = new DBObjectCollection();
 
 	        // Start a transaction
-			if (collection.Count > 0)
-		        using (var trans = StartTransaction())
-			        foreach (ObjectId objectId in collection)
-						if (!objectId.IsNull && !objectId.IsErased)
-							dbCollection.Add(trans.GetObject(objectId, OpenMode.ForRead));
+	        if (collection.Count > 0)
+	        {
+		        var trans = ongoingTransaction ?? StartTransaction();
 
-	        return dbCollection;
+		        foreach (ObjectId objectId in collection)
+			        if (!objectId.IsNull && !objectId.IsErased)
+				        dbCollection.Add(trans.GetObject(objectId, OpenMode.ForRead));
+
+		        if (ongoingTransaction is null)
+			        trans.Dispose();
+	        }
+
+            return dbCollection;
         }
 
         /// <summary>
@@ -214,14 +226,21 @@ namespace Extensions.AutoCAD
         /// <summary>
         /// Get the collection of <see cref="DBObject"/>'s of <paramref name="objectIds"/>.
         /// </summary>
-        public static IEnumerable<DBObject> GetDBObjects(this IEnumerable<ObjectId> objectIds)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static IEnumerable<DBObject> GetDBObjects(this IEnumerable<ObjectId> objectIds, Transaction ongoingTransaction = null)
 		{
 			if (objectIds is null)
 				return null;
 
             // Start a transaction
-            using (var trans = StartTransaction())
-	            return objectIds.Select(obj => trans.GetObject(obj, OpenMode.ForRead)).ToArray();
+            var trans = ongoingTransaction ?? StartTransaction();
+
+            var objs = objectIds.Select(obj => trans.GetObject(obj, OpenMode.ForRead)).ToArray();
+
+            if (ongoingTransaction is null)
+                trans.Dispose();
+
+            return objs;
 		}
 
         /// <summary>
@@ -296,74 +315,94 @@ namespace Extensions.AutoCAD
         /// Read this <see cref="ObjectId"/>'s XData as an <see cref="Array"/> of <see cref="TypedValue"/>.
         /// </summary>
         /// <param name="appName">The application name.</param>
-        public static TypedValue[] ReadXData(this ObjectId objectId, string appName)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static TypedValue[] ReadXData(this ObjectId objectId, string appName, Transaction ongoingTransaction = null)
         {
 	        if (objectId.IsNull || objectId.IsErased)
 		        return null;
 
 	        // Start a transaction
-	        using (var trans = StartTransaction())
-		        return trans.GetObject(objectId, OpenMode.ForRead).ReadXData(appName);
+	        var trans = ongoingTransaction ?? StartTransaction();
+
+            // Get XData
+            var data = trans.GetObject(objectId, OpenMode.ForRead).ReadXData(appName);
+
+            if (ongoingTransaction is null)
+                trans.Dispose();
+
+            return data;
         }
 
-		/// <summary>
+        /// <summary>
         /// Set extended data to this <paramref name="objectId"/>.
         /// </summary>
         /// <param name="objectId">The <see cref="ObjectId"/>.</param>
         /// <param name="data">The <see cref="ResultBuffer"/> containing the extended data.</param>
-        public static void SetXData(this ObjectId objectId, ResultBuffer data)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void SetXData(this ObjectId objectId, ResultBuffer data, Transaction ongoingTransaction = null)
         {
 	        if (objectId.IsNull || objectId.IsErased)
 		        return;
 
-            // Start a transaction
-            using (var trans = StartTransaction())
+	        // Start a transaction
+	        var trans = ongoingTransaction ?? StartTransaction();
+
 	        using (var ent   = (Entity) trans.GetObject(objectId, OpenMode.ForWrite))
 	        {
 				if (ent != null)
 					ent.XData = data;
-				trans.Commit();
 	        }
+
+            if (ongoingTransaction != null)
+                return;
+
+	        trans.Commit();
+            trans.Dispose();
         }
 
-		/// <summary>
+        /// <summary>
         /// Set extended data to this <paramref name="objectId"/>.
         /// </summary>
         /// <param name="objectId">The <see cref="ObjectId"/>.</param>
         /// <param name="data">The collection of <see cref="TypedValue"/> containing the extended data.</param>
-        public static void SetXData(this ObjectId objectId, IEnumerable<TypedValue> data)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void SetXData(this ObjectId objectId, IEnumerable<TypedValue> data, Transaction ongoingTransaction = null)
         {
 	        using (var rb = new ResultBuffer(data.ToArray()))
-		        objectId.SetXData(rb);
+		        objectId.SetXData(rb, ongoingTransaction);
         }
 
-		/// <summary>
-		/// Set extended data to this <paramref name="dbObject"/>.
-		/// </summary>
-		/// <param name="dbObject">The <see cref="DBObject"/>.</param>
-		/// <param name="data">The <see cref="ResultBuffer"/> containing the extended data.</param>
-		public static void SetXData(this DBObject dbObject, ResultBuffer data) => dbObject.ObjectId.SetXData(data);
+        /// <summary>
+        /// Set extended data to this <paramref name="dbObject"/>.
+        /// </summary>
+        /// <param name="dbObject">The <see cref="DBObject"/>.</param>
+        /// <param name="data">The <see cref="ResultBuffer"/> containing the extended data.</param>
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+		public static void SetXData(this DBObject dbObject, ResultBuffer data, Transaction ongoingTransaction = null) => dbObject.ObjectId.SetXData(data, ongoingTransaction);
 
         /// <summary>
         /// Set extended data to this <paramref name="dbObject"/>.
         /// </summary>
         /// <param name="dbObject">The <see cref="DBObject"/>.</param>
         /// <param name="data">The collection of <see cref="TypedValue"/> containing the extended data.</param>
-		public static void SetXData(this DBObject dbObject, IEnumerable<TypedValue> data) => dbObject.ObjectId.SetXData(data);
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+		public static void SetXData(this DBObject dbObject, IEnumerable<TypedValue> data, Transaction ongoingTransaction = null) => dbObject.ObjectId.SetXData(data, ongoingTransaction);
 
         /// <summary>
         /// Set extended data to this <paramref name="entity"/>.
         /// </summary>
         /// <param name="entity">The <see cref="Entity"/>.</param>
         /// <param name="data">The <see cref="ResultBuffer"/> containing the extended data.</param>
-        public static void SetXData(this Entity entity, ResultBuffer data) => entity.ObjectId.SetXData(data);
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void SetXData(this Entity entity, ResultBuffer data, Transaction ongoingTransaction = null) => entity.ObjectId.SetXData(data, ongoingTransaction);
 
         /// <summary>
         /// Set extended data to this <paramref name="entity"/>.
         /// </summary>
         /// <param name="entity">The <see cref="Entity"/>.</param>
         /// <param name="data">The collection of <see cref="TypedValue"/> containing the extended data.</param>
-        public static void SetXData(this Entity entity, IEnumerable<TypedValue> data) => entity.ObjectId.SetXData(data);
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void SetXData(this Entity entity, IEnumerable<TypedValue> data, Transaction ongoingTransaction = null) => entity.ObjectId.SetXData(data, ongoingTransaction);
 
 		/// <summary>
         /// Clean extended data attached to this <paramref name="objectId"/>.
@@ -385,289 +424,339 @@ namespace Extensions.AutoCAD
         /// </summary>
         /// <param name="dbObject">The <see cref="DBObject"/>.</param>
         /// <param name="erasedEvent">The event to call if <paramref name="dbObject"/> is erased.</param>
-        public static void Add(this DBObject dbObject, ObjectErasedEventHandler erasedEvent = null) => ((Entity)dbObject).Add(erasedEvent);
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Add(this DBObject dbObject, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null) => ((Entity)dbObject).Add(erasedEvent, ongoingTransaction);
 
         /// <summary>
         /// Add this <paramref name="entity"/> to the drawing.
         /// </summary>
         /// <param name="entity">The <see cref="Entity"/>.</param>
         /// <param name="erasedEvent">The event to call if <paramref name="entity"/> is erased.</param>
-        public static void Add(this Entity entity, ObjectErasedEventHandler erasedEvent = null)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Add(this Entity entity, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null)
         {
 	        if (entity is null)
 		        return;
 
+	        // Start a transaction
+	        var trans = ongoingTransaction ?? StartTransaction();
 
-            // Start a transaction
-            using (var trans = StartTransaction())
+	        // Open the Block table for read
+	        var blkTbl = (BlockTable) trans.GetObject(BlockTableId, OpenMode.ForRead);
 
-		        // Open the Block table for read
-	        using (var blkTbl = (BlockTable) trans.GetObject(BlockTableId, OpenMode.ForRead))
+	        // Open the Block table record Model space for write
+	        var blkTblRec = (BlockTableRecord) trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
 
-		        // Open the Block table record Model space for write
-	        using (var blkTblRec = (BlockTableRecord)trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForWrite))
-	        {
-		        // Add the object to the drawing
-		        blkTblRec.AppendEntity(entity);
-		        trans.AddNewlyCreatedDBObject(entity, true);
+	        // Add the object to the drawing
+	        blkTblRec.AppendEntity(entity);
+	        trans.AddNewlyCreatedDBObject(entity, true);
 
-				if (erasedEvent != null)
-					entity.Erased += erasedEvent;
+	        if (erasedEvent != null)
+		        entity.Erased += erasedEvent;
 
-		        // Commit changes
-		        trans.Commit();
-	        }
+	        // Commit changes
+	        if (ongoingTransaction != null)
+		        return;
+
+	        trans.Commit();
+	        trans.Dispose();
         }
 
         /// <summary>
         /// Add the <paramref name="objects"/> in this collection to the drawing.
         /// </summary>
         /// <param name="erasedEvent">The event to call if <paramref name="objects"/> are erased.</param>
-        public static void Add(this IEnumerable<DBObject> objects, ObjectErasedEventHandler erasedEvent = null) => objects?.Cast<Entity>().Add(erasedEvent);
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Add(this IEnumerable<DBObject> objects, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null) => objects?.Cast<Entity>().Add(erasedEvent, ongoingTransaction);
 
         /// <summary>
         /// Add the <paramref name="entities"/> in this collection to the drawing.
         /// </summary>
         /// <param name="erasedEvent">The event to call if <paramref name="entities"/> are erased.</param>
-        public static void Add(this IEnumerable<Entity> entities, ObjectErasedEventHandler erasedEvent = null)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Add(this IEnumerable<Entity> entities, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null)
         {
 	        if (entities is null || !entities.Any())
 		        return;
 
 	        // Start a transaction
-	        using (var trans = StartTransaction())
+	        var trans = ongoingTransaction ?? StartTransaction();
 
-		        // Open the Block table for read
-	        using (var blkTbl = (BlockTable)trans.GetObject(BlockTableId, OpenMode.ForRead))
+	        // Open the Block table for read
+	        var blkTbl = (BlockTable) trans.GetObject(BlockTableId, OpenMode.ForRead);
 
-		        // Open the Block table record Model space for write
-	        using (var blkTblRec = (BlockTableRecord)trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForWrite))
+	        // Open the Block table record Model space for write
+	        var blkTblRec = (BlockTableRecord) trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
+
+	        // Add the objects to the drawing
+	        foreach (var ent in entities)
 	        {
-		        // Add the objects to the drawing
-		        foreach (var ent in entities)
-		        {
-			        blkTblRec.AppendEntity(ent);
-			        trans.AddNewlyCreatedDBObject(ent, true);
+		        blkTblRec.AppendEntity(ent);
+		        trans.AddNewlyCreatedDBObject(ent, true);
 
-			        if (erasedEvent != null)
-				        ent.Erased += erasedEvent;
-		        }
-
-                // Commit changes
-                trans.Commit();
+		        if (erasedEvent != null)
+			        ent.Erased += erasedEvent;
 	        }
+
+	        // Commit changes
+	        if (ongoingTransaction != null)
+		        return;
+
+	        trans.Commit();
+	        trans.Dispose();
         }
 
         /// <summary>
         /// Register a <see cref="ObjectErasedEventHandler"/> to this <paramref name="objectId"/>
         /// </summary>
         /// <param name="handler"> The <see cref="ObjectErasedEventHandler"/> to add.</param>
-        public static void RegisterErasedEvent(this ObjectId objectId, ObjectErasedEventHandler handler)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void RegisterErasedEvent(this ObjectId objectId, ObjectErasedEventHandler handler, Transaction ongoingTransaction = null)
         {
-			if (handler is null || objectId.IsNull || objectId.IsErased)
-				return;
+	        if (handler is null || objectId.IsNull || objectId.IsErased)
+		        return;
 
-			// Start a transaction
-			using (var trans = StartTransaction())
-			{
-				using (var ent = (Entity) trans.GetObject(objectId, OpenMode.ForWrite))
-					ent.Erased += handler;
+	        // Start a transaction
+	        var trans = ongoingTransaction ?? StartTransaction();
 
-				// Commit changes
-				trans.Commit();
-			}
+	        using (var ent = (Entity) trans.GetObject(objectId, OpenMode.ForWrite))
+		        ent.Erased += handler;
+
+	        // Commit changes
+	        if (ongoingTransaction != null)
+		        return;
+
+	        trans.Commit();
+	        trans.Dispose();
         }
 
         /// <summary>
         /// Register a <see cref="ObjectErasedEventHandler"/> to these <paramref name="objectIds"/>
         /// </summary>
         /// <param name="handler"> The <see cref="ObjectErasedEventHandler"/> to add.</param>
-        public static void RegisterErasedEvent(this IEnumerable<ObjectId> objectIds, ObjectErasedEventHandler handler)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void RegisterErasedEvent(this IEnumerable<ObjectId> objectIds, ObjectErasedEventHandler handler, Transaction ongoingTransaction = null)
         {
-			if (handler is null || objectIds is null || !objectIds.Any())
-				return;
+	        if (handler is null || objectIds is null || !objectIds.Any())
+		        return;
 
-			// Start a transaction
-			using (var trans = StartTransaction())
-			{
-				foreach (var obj in objectIds)
-					if (!obj.IsNull || !obj.IsErased)
-						using (var ent = (Entity) trans.GetObject(obj, OpenMode.ForWrite))
-							ent.Erased += handler;
+	        // Start a transaction
+	        var trans = ongoingTransaction ?? StartTransaction();
 
-				// Commit changes
-				trans.Commit();
-			}
+	        foreach (var obj in objectIds)
+		        if (!obj.IsNull || !obj.IsErased)
+			        using (var ent = (Entity) trans.GetObject(obj, OpenMode.ForWrite))
+				        ent.Erased += handler;
+
+	        // Commit changes
+	        if (ongoingTransaction != null)
+		        return;
+
+	        trans.Commit();
+	        trans.Dispose();
         }
 
         /// <summary>
         /// Unregister a <see cref="ObjectErasedEventHandler"/> from this <paramref name="objectId"/>
         /// </summary>
         /// <param name="handler"> The <see cref="ObjectErasedEventHandler"/> to remove.</param>
-        public static void UnregisterErasedEvent(this ObjectId objectId, ObjectErasedEventHandler handler)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void UnregisterErasedEvent(this ObjectId objectId, ObjectErasedEventHandler handler, Transaction ongoingTransaction = null)
         {
 	        if (handler is null || objectId.IsNull || objectId.IsErased)
 		        return;
 
-            // Start a transaction
-            using (var trans = StartTransaction())
-			{
-				using (var ent = (Entity) trans.GetObject(objectId, OpenMode.ForWrite))
-					ent.Erased -= handler;
+	        // Start a transaction
+	        var trans = ongoingTransaction ?? StartTransaction();
 
-				// Commit changes
-				trans.Commit();
-			}
+	        using (var ent = (Entity) trans.GetObject(objectId, OpenMode.ForWrite))
+		        ent.Erased -= handler;
+
+	        // Commit changes
+	        if (ongoingTransaction != null)
+		        return;
+
+	        trans.Commit();
+	        trans.Dispose();
         }
 
         /// <summary>
         /// Unregister a <see cref="ObjectErasedEventHandler"/> from these <paramref name="objectIds"/>
         /// </summary>
         /// <param name="handler"> The <see cref="ObjectErasedEventHandler"/> to add.</param>
-        public static void UnregisterErasedEvent(this IEnumerable<ObjectId> objectIds, ObjectErasedEventHandler handler)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void UnregisterErasedEvent(this IEnumerable<ObjectId> objectIds, ObjectErasedEventHandler handler, Transaction ongoingTransaction = null)
         {
 	        if (handler is null || objectIds is null || !objectIds.Any())
 		        return;
 
-	        // Start a transaction
-	        using (var trans = StartTransaction())
-	        {
-		        foreach (var obj in objectIds)
-			        if (!obj.IsNull || !obj.IsErased)
-				        using (var ent = (Entity)trans.GetObject(obj, OpenMode.ForWrite))
-					        ent.Erased -= handler;
+            // Start a transaction
+            var trans = ongoingTransaction ?? StartTransaction();
 
-		        // Commit changes
-		        trans.Commit();
-	        }
+            foreach (var obj in objectIds)
+	            if (!obj.IsNull || !obj.IsErased)
+		            using (var ent = (Entity) trans.GetObject(obj, OpenMode.ForWrite))
+			            ent.Erased -= handler;
+
+            // Commit changes
+	        if (ongoingTransaction != null)
+		        return;
+
+	        trans.Commit();
+	        trans.Dispose();
         }
 
         /// <summary>
         /// Remove this object from drawing.
         /// </summary>
-        public static void Remove(this ObjectId obj)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this ObjectId obj, Transaction ongoingTransaction = null)
         {
 	        if (obj.IsNull || obj.IsErased)
 		        return;
 
             // Start a transaction
-            using (var trans = StartTransaction())
-            {
-	            using (var ent = trans.GetObject(obj, OpenMode.ForWrite))
-		            ent.Erase();
+            var trans = ongoingTransaction ?? StartTransaction();
 
-	            // Commit changes
-	            trans.Commit();
-            }
+            using (var ent = trans.GetObject(obj, OpenMode.ForWrite))
+	            ent.Erase();
+
+            // Commit changes
+            if (ongoingTransaction != null)
+	            return;
+
+            trans.Commit();
+            trans.Dispose();
         }
 
         /// <summary>
         /// Remove this object from drawing.
         /// </summary>
-        public static void Remove(this DBObject obj) => obj?.ObjectId.Remove();
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this DBObject obj, Transaction ongoingTransaction = null) => obj?.ObjectId.Remove(ongoingTransaction);
 
         /// <summary>
         /// Remove this <paramref name="entity"/> from drawing.
         /// </summary>
-        public static void Remove(this Entity entity) => entity?.ObjectId.Remove();
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this Entity entity, Transaction ongoingTransaction = null) => entity?.ObjectId.Remove(ongoingTransaction);
 
         /// <summary>
         /// Remove all the objects in this collection from drawing.
         /// </summary>
         /// <param name="objects">The collection containing the <see cref="ObjectId"/>'s to erase.</param>
-        public static void Remove(this IEnumerable<ObjectId> objects)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this IEnumerable<ObjectId> objects, Transaction ongoingTransaction = null)
         {
 	        if (objects is null || !objects.Any())
 		        return;
 
             // Start a transaction
-            using (var trans = StartTransaction())
-	        {
-                foreach (var obj in objects)
-	                if (!obj.IsNull && !obj.IsErased)
-		                using (var ent = trans.GetObject(obj, OpenMode.ForWrite))
-			                ent.Erase();
+            var trans = ongoingTransaction ?? StartTransaction();
 
-                // Commit changes
-                trans.Commit();
-	        }
+            foreach (var obj in objects)
+	            if (!obj.IsNull && !obj.IsErased)
+		            using (var ent = trans.GetObject(obj, OpenMode.ForWrite))
+			            ent.Erase();
+
+            // Commit changes
+            if (ongoingTransaction != null)
+	            return;
+
+            trans.Commit();
+            trans.Dispose();
         }
 
         /// <summary>
         /// Remove all the objects in this collection from drawing.
         /// </summary>
         /// <param name="objects">The collection containing the <see cref="DBObject"/>'s to erase.</param>
-        public static void Remove(this IEnumerable<DBObject> objects) => objects?.GetObjectIds()?.Remove();
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this IEnumerable<DBObject> objects, Transaction ongoingTransaction = null) => objects?.GetObjectIds()?.Remove(ongoingTransaction);
 
         /// <summary>
         /// Remove all the objects in this collection from drawing.
         /// </summary>
         /// <param name="objects">The <see cref="ObjectIdCollection"/> containing the objects to erase.</param>
-        public static void Remove(this ObjectIdCollection objects) => objects?.Cast<ObjectId>().Remove();
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this ObjectIdCollection objects, Transaction ongoingTransaction = null) => objects?.Cast<ObjectId>().Remove(ongoingTransaction);
 
         /// <summary>
         /// Erase all the objects in this <see cref="DBObjectCollection"/>.
         /// </summary>
         /// <param name="objects">The <see cref="DBObjectCollection"/> containing the objects to erase.</param>
-        public static void Remove(this DBObjectCollection objects) => objects?.ToObjectIdCollection()?.Remove();
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this DBObjectCollection objects, Transaction ongoingTransaction = null) => objects?.ToObjectIdCollection()?.Remove(ongoingTransaction);
 
-		/// <summary>
+        /// <summary>
         /// Move the objects in this collection to drawing bottom.
         /// </summary>
-        public static void MoveToBottom(this IEnumerable<ObjectId> objectIds)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void MoveToBottom(this IEnumerable<ObjectId> objectIds, Transaction ongoingTransaction = null)
         {
 	        if (objectIds is null || !objectIds.Any())
 		        return;
 
-            using (var trans = StartTransaction())
-	        {
-		        var blkTbl = (BlockTable)trans.GetObject(BlockTableId, OpenMode.ForRead);
+	        var trans = ongoingTransaction ?? StartTransaction();
 
-		        var blkTblRec = (BlockTableRecord) trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForRead);
+	        var blkTbl = (BlockTable) trans.GetObject(BlockTableId, OpenMode.ForRead);
 
-                var drawOrder = (DrawOrderTable)trans.GetObject(blkTblRec.DrawOrderTableId, OpenMode.ForWrite);
+	        var blkTblRec = (BlockTableRecord) trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForRead);
 
-                // Move the panels to bottom
-                using (var objs = new ObjectIdCollection(objectIds.ToArray()))
-	                drawOrder.MoveToBottom(objs);
+	        var drawOrder = (DrawOrderTable) trans.GetObject(blkTblRec.DrawOrderTableId, OpenMode.ForWrite);
 
-				trans.Commit();
-	        }
+	        // Move the panels to bottom
+	        using (var objs = new ObjectIdCollection(objectIds.ToArray()))
+		        drawOrder.MoveToBottom(objs);
+
+	        // Commit changes
+	        if (ongoingTransaction != null)
+		        return;
+
+	        trans.Commit();
+	        trans.Dispose();
         }
 
         /// <summary>
         /// Move the objects in this collection to drawing bottom.
         /// </summary>
-        public static void MoveToBottom(this IEnumerable<DBObject> objects) => objects?.GetObjectIds()?.MoveToBottom();
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void MoveToBottom(this IEnumerable<DBObject> objects, Transaction ongoingTransaction = null) => objects?.GetObjectIds()?.MoveToBottom(ongoingTransaction);
 
         /// <summary>
         /// Move the objects in this collection to drawing top.
         /// </summary>
-        public static void MoveToTop(this IEnumerable<ObjectId> objectIds)
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void MoveToTop(this IEnumerable<ObjectId> objectIds, Transaction ongoingTransaction = null)
         {
 			if (objectIds is null || !objectIds.Any())
 				return;
 
-	        using (var trans = StartTransaction())
-	        {
-		        var blkTbl = (BlockTable)trans.GetObject(BlockTableId, OpenMode.ForRead);
+			var trans = ongoingTransaction ?? StartTransaction();
 
-		        var blkTblRec = (BlockTableRecord)trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForRead);
+			var blkTbl = (BlockTable) trans.GetObject(BlockTableId, OpenMode.ForRead);
 
-		        var drawOrder = (DrawOrderTable)trans.GetObject(blkTblRec.DrawOrderTableId, OpenMode.ForWrite);
+			var blkTblRec = (BlockTableRecord) trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForRead);
 
-                // Move the panels to bottom
-                using (var objs = new ObjectIdCollection(objectIds.ToArray()))
-	                drawOrder.MoveToTop(objs);
+			var drawOrder = (DrawOrderTable) trans.GetObject(blkTblRec.DrawOrderTableId, OpenMode.ForWrite);
 
-                trans.Commit();
-	        }
+			// Move the panels to bottom
+			using (var objs = new ObjectIdCollection(objectIds.ToArray()))
+				drawOrder.MoveToTop(objs);
+
+			// Commit changes
+			if (ongoingTransaction != null)
+				return;
+
+			trans.Commit();
+			trans.Dispose();
         }
 
         /// <summary>
         /// Move the objects in this collection to drawing top.
         /// </summary>
-        public static void MoveToTop(this IEnumerable<DBObject> objects) => objects?.GetObjectIds()?.MoveToTop();
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void MoveToTop(this IEnumerable<DBObject> objects, Transaction ongoingTransaction = null) => objects?.GetObjectIds()?.MoveToTop(ongoingTransaction);
 
 		/// <summary>
         /// Start a new transaction.
