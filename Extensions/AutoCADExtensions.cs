@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Extensions.Number;
 using MathNet.Numerics;
@@ -21,6 +22,11 @@ namespace Extensions.AutoCAD
 	    /// Get current active <see cref="Autodesk.AutoCAD.ApplicationServices.Document"/>.
 	    /// </summary>
 	    private static Document Document => DocumentManager.MdiActiveDocument;
+
+	    /// <summary>
+	    /// Get <see cref="Autodesk.AutoCAD.ApplicationServices.Document.Editor"/>.
+	    /// </summary>
+	    private static Editor Editor => Document.Editor;
 
 	    /// <summary>
 	    /// Get current <see cref="Autodesk.AutoCAD.DatabaseServices.Database"/>.
@@ -544,9 +550,7 @@ namespace Extensions.AutoCAD
 	        var trans = ongoingTransaction ?? StartTransaction();
 
 	        foreach (var obj in objectIds)
-		        if (!obj.IsNull || !obj.IsErased)
-			        using (var ent = (Entity) trans.GetObject(obj, OpenMode.ForWrite))
-				        ent.Erased += handler;
+                obj.RegisterErasedEvent(handler, trans);
 
 	        // Commit changes
 	        if (ongoingTransaction != null)
@@ -594,9 +598,7 @@ namespace Extensions.AutoCAD
             var trans = ongoingTransaction ?? StartTransaction();
 
             foreach (var obj in objectIds)
-	            if (!obj.IsNull || !obj.IsErased)
-		            using (var ent = (Entity) trans.GetObject(obj, OpenMode.ForWrite))
-			            ent.Erased -= handler;
+                obj.UnregisterErasedEvent(handler, trans);
 
             // Commit changes
 	        if (ongoingTransaction != null)
@@ -618,7 +620,7 @@ namespace Extensions.AutoCAD
             // Start a transaction
             var trans = ongoingTransaction ?? StartTransaction();
 
-            using (var ent = trans.GetObject(obj, OpenMode.ForWrite))
+            using (var ent = (Entity) trans.GetObject(obj, OpenMode.ForWrite))
 	            ent.Erase();
 
             // Commit changes
@@ -655,9 +657,7 @@ namespace Extensions.AutoCAD
             var trans = ongoingTransaction ?? StartTransaction();
 
             foreach (var obj in objects)
-	            if (!obj.IsNull && !obj.IsErased)
-		            using (var ent = trans.GetObject(obj, OpenMode.ForWrite))
-			            ent.Erase();
+	            obj.Remove(trans);
 
             // Commit changes
             if (ongoingTransaction != null)
@@ -687,6 +687,18 @@ namespace Extensions.AutoCAD
         /// <param name="objects">The <see cref="DBObjectCollection"/> containing the objects to erase.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
         public static void Remove(this DBObjectCollection objects, Transaction ongoingTransaction = null) => objects?.ToObjectIdCollection()?.Remove(ongoingTransaction);
+
+        /// <summary>
+        /// Erase all the objects in this <paramref name="layerName"/>.
+        /// </summary>
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this string layerName, Transaction ongoingTransaction = null) => layerName.GetObjectIds()?.Remove(ongoingTransaction);
+
+        /// <summary>
+        /// Erase all the objects in these <paramref name="layerNames"/>.
+        /// </summary>
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void Remove(this IEnumerable<string> layerNames, Transaction ongoingTransaction = null) => layerNames.GetObjectIds()?.Remove(ongoingTransaction);
 
         /// <summary>
         /// Move the objects in this collection to drawing bottom.
@@ -758,7 +770,107 @@ namespace Extensions.AutoCAD
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
         public static void MoveToTop(this IEnumerable<DBObject> objects, Transaction ongoingTransaction = null) => objects?.GetObjectIds()?.MoveToTop(ongoingTransaction);
 
-		/// <summary>
+        /// <summary>
+        /// Returns a <see cref="SelectionFilter"/> for objects in this <paramref name="layerName"/>.
+        /// </summary>
+        public static SelectionFilter LayerFilter(this string layerName) => new SelectionFilter(new [] {new TypedValue((int) DxfCode.LayerName, layerName)});
+
+        /// <summary>
+        /// Returns a <see cref="SelectionFilter"/> for objects in these <paramref name="layerNames"/>.
+        /// </summary>
+        public static SelectionFilter LayerFilter(this IEnumerable<string> layerNames) => new SelectionFilter(new [] {new TypedValue((int) DxfCode.LayerName, layerNames.Aggregate(string.Empty, (current, layer) => current + $"{layer},"))});
+
+        /// <summary>
+        /// Get a collection containing all the <see cref="ObjectId"/>'s in this <see cref="layerName"/>.
+        /// </summary>
+        public static IEnumerable<ObjectId> GetObjectIds(this string layerName)
+        {
+				// Get the entities on the layername
+            var selRes = Editor.SelectAll(layerName.LayerFilter());
+
+            return
+                selRes.Status == PromptStatus.OK && selRes.Value.Count > 0 ? selRes.Value.GetObjectIds() : new ObjectId[0];
+        }
+
+        /// <summary>
+        /// Get a collection containing all the <see cref="ObjectId"/>'s in those <paramref name="layerNames"/>.
+        /// </summary>
+        public static IEnumerable<ObjectId> GetObjectIds(this IEnumerable<string> layerNames)
+        {
+            if (layerNames is null || !layerNames.Any())
+                return null;
+
+            // Get the entities on the layername
+            var selRes = Editor.SelectAll(layerNames.LayerFilter());
+
+            return
+                selRes.Status == PromptStatus.OK && selRes.Value.Count > 0 ? selRes.Value.GetObjectIds() : new ObjectId[0];
+        }
+
+        /// <summary>
+        /// Get a collection containing all the <see cref="DBObject"/>'s in this <see cref="layerName"/>.
+        /// </summary>
+        public static IEnumerable<DBObject> GetDBObjects(this string layerName) => layerName.GetObjectIds()?.GetDBObjects();
+
+        /// <summary>
+        /// Get a collection containing all the <see cref="DBObject"/>'s in those <paramref name="layerNames"/>.
+        /// </summary>
+        public static IEnumerable<DBObject> GetDBObjects(this IEnumerable<string> layerNames) => layerNames.GetObjectIds()?.GetDBObjects();
+
+        /// <summary>
+        /// Create a block in the database.
+        /// </summary>
+        /// <param name="blockEntities">The collection of <see cref="Entity"/>'s that form the block.</param>
+        /// <param name="originPoint">The origin point of the block.</param>
+        /// <param name="blockName">The name to save the block in database.</param>
+        /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
+        public static void CreateBlock(this IEnumerable<Entity> blockEntities, Point3d originPoint, string blockName, Transaction ongoingTransaction = null)
+        {
+	        if (blockEntities is null)
+		        return;
+
+            var trans = ongoingTransaction ?? StartTransaction();
+
+		        // Open the Block table for read
+	        using (var blkTbl = (BlockTable)trans.GetObject(Database.BlockTableId, OpenMode.ForRead))
+	        {
+		        // Check if the support blocks already exist in the drawing
+		        if (blkTbl.Has(blockName))
+			        return;
+
+		        // Create the X block
+		        using (var blkTblRec = new BlockTableRecord())
+		        {
+			        blkTblRec.Name = blockName;
+
+			        // Add the block table record to the block table and to the transaction
+			        blkTbl.UpgradeOpen();
+			        blkTbl.Add(blkTblRec);
+			        trans.AddNewlyCreatedDBObject(blkTblRec, true);
+
+			        // Set the insertion point for the block
+			        blkTblRec.Origin = originPoint;
+
+			        // Add the elements to the block
+			        foreach (var ent in blockEntities)
+			        {
+				        blkTblRec.AppendEntity(ent);
+				        trans.AddNewlyCreatedDBObject(ent, true);
+			        }
+		        }
+	        }
+
+	        // Commit changes
+	        if (ongoingTransaction != null)
+		        return;
+
+	        trans.Commit();
+	        trans.Dispose();
+        }
+
+
+
+        /// <summary>
         /// Start a new transaction.
         /// </summary>
         private static Transaction StartTransaction() => Database.TransactionManager.StartTransaction();
