@@ -108,10 +108,13 @@
   <ItemGroup>
     <Compile Include="AutoCADExtensions.cs" />
     <Compile Include="InterfaceExtensions.cs" />
+    <Compile Include="SolidEqualityComparer.cs" />
     <Compile Include="Number\MatricesAndVectors.cs" />
     <Compile Include="Number\UnitConverter.cs" />
     <Compile Include="Number\Trigonometry.cs" />
     <Compile Include="Number\NumberExtensions.cs" />
+    <Compile Include="LineEqualityComparer .cs" />
+    <Compile Include="PointEqualityComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitExtensions.cs" />
   </ItemGroup>
