@@ -17,7 +17,6 @@ namespace Extensions.AutoCAD
 {
     public static class Extensions
     {
-
 	    /// <summary>
 	    /// Get current active <see cref="Autodesk.AutoCAD.ApplicationServices.Document"/>.
 	    /// </summary>
@@ -98,8 +97,7 @@ namespace Extensions.AutoCAD
 		/// </summary>
 		/// <param name="otherPoint">The other <see cref="Point3d"/> to compare.</param>
 		/// <param name="tolerance">The tolerance to considering equivalent.</param>
-		public static bool Approx(this Point3d point, Point3d otherPoint, double tolerance = 1E-3)
-			=> point.X.Approx(otherPoint.X, tolerance) && point.Y.Approx(otherPoint.Y, tolerance) && point.Z.Approx(otherPoint.Z, tolerance);
+		public static bool Approx(this Point3d point, Point3d otherPoint, double tolerance = 1E-3) => point.X.Approx(otherPoint.X, tolerance) && point.Y.Approx(otherPoint.Y, tolerance) && point.Z.Approx(otherPoint.Z, tolerance);
 
 		/// <summary>
         /// Return this collection of <see cref="Point3d"/>'s ordered in ascending Y then ascending X.
@@ -868,7 +866,131 @@ namespace Extensions.AutoCAD
 	        trans.Dispose();
         }
 
+        /// <summary>
+        /// Get the surrounding <see cref="Line"/>'s of this quadrilateral <paramref name="solid"/>.
+        /// </summary>
+        public static IEnumerable<Line> GetEdges(this Solid solid)
+        {
+	        // Get the vertices ordered
+	        var verts = solid.GetVertices().Order().ToArray();
 
+            // Verify if it is quadrilateral
+            return
+	            verts.Length is 4
+		            ? Lines()
+		            : null;
+
+            // Return the lines
+            IEnumerable<Line> Lines()
+            {
+	            yield return new Line(verts[0], verts[1]);
+	            yield return new Line(verts[2], verts[3]);
+	            yield return new Line(verts[2], verts[0]);
+	            yield return new Line(verts[3], verts[1]);
+            }
+        }
+
+        /// <summary>
+        /// Divide a <paramref name="line"/> in a <paramref name="number"/> of new ones.
+        /// </summary>
+        /// <param name="number">The number of lines to return.</param>
+        public static IEnumerable<Line> Divide(this Line line, int number)
+        {
+	        // Get the coordinates of the initial and end points
+	        Point3d
+		        start = line.StartPoint,
+		        end   = line.EndPoint;
+
+	        // Calculate the distance of the points in X and Y
+	        double
+		        distX = end.DistanceInX(start) / number,
+		        distY = end.DistanceInY(start) / number;
+
+	        // Create the new lines
+	        for (int i = 0; i < number; i++)
+	        {
+		        // Get the coordinates of the other points
+		        double
+			        xCrd = start.X + distX,
+			        yCrd = start.Y + distY;
+
+		        var endPt = new Point3d(xCrd, yCrd, 0);
+
+                // Create the line
+                yield return new Line(start, endPt);
+
+		        // Set the start point of the next line
+		        start = endPt;
+	        }
+        }
+        
+        /// <summary>
+        /// Divide a rectangular <paramref name="solid"/> into new ones.
+        /// </summary>
+        /// <param name="numberOfRows">The number of rows of new solids to return.</param>
+        /// <param name="numberOfColumns">The number of columns of new solids to return.</param>
+        public static IEnumerable<Solid> Divide(this Solid solid, int numberOfRows, int numberOfColumns)
+        {
+            // Verify if the solid is rectangular
+            return
+	            solid.IsRectangular()
+		            ? Divide()
+		            : null;
+
+            IEnumerable<Solid> Divide()
+            {
+	            // Get vertices
+	            var verts = solid.GetVertices().ToArray();
+
+	            // Get the distances between vertices of new solids
+	            double
+		            x = verts[0].DistanceTo(verts[1]) / numberOfColumns,
+		            y = verts[0].DistanceTo(verts[2]) / numberOfRows;
+
+	            for (int r = 0; r < numberOfRows; r++)
+	            {
+		            // Get starting y coordinate
+		            var yStart = verts[0].Y + r * y;
+
+		            for (int c = 0; c < numberOfColumns; c++)
+		            {
+			            // Get starting x coordinate
+			            var xStart = verts[0].X + c * x;
+
+			            // Get vertices of the solid
+			            Point3d[] newVerts =
+			            {
+				            new Point3d(xStart,     yStart,     0),
+				            new Point3d(xStart + x, yStart,     0),
+				            new Point3d(xStart,     yStart + y, 0),
+				            new Point3d(xStart + x, yStart + y, 0),
+			            };
+
+			            // Return the new solid
+			            yield return new Solid(newVerts[0], newVerts[1], newVerts[2], newVerts[3]);
+		            }
+	            }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if this <paramref name="solid"/> is rectangular.
+        /// </summary>
+        public static bool IsRectangular(this Solid solid)
+        {
+            // Get the vertices
+            var verts = solid.GetVertices().ToArray();
+
+            // Get the angles
+            double[] angles =
+            {
+	            (verts[0].AngleTo(verts[1]) - verts[0].AngleTo(verts[2])).Abs(),
+	            (verts[3].AngleTo(verts[1]) - verts[3].AngleTo(verts[2])).Abs()
+            };
+
+            return
+	            angles.All(angle => angle.Approx(Constants.PiOver2, 1E-3) || angle.Approx(Constants.Pi3Over2, 1E-3));
+        }
 
         /// <summary>
         /// Start a new transaction.
