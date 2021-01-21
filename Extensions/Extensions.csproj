@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoCADExtensions.cs" />
+    <Compile Include="Elist.cs" />
     <Compile Include="InterfaceExtensions.cs" />
     <Compile Include="SolidEqualityComparer.cs" />
     <Compile Include="Number\MatricesAndVectors.cs" />

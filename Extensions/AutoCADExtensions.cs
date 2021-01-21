@@ -149,7 +149,7 @@ namespace Extensions.AutoCAD
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
         public static DBObject ToDBObject(this ObjectId objectId, Transaction ongoingTransaction = null)
         {
-	        if (objectId.IsNull || objectId.IsErased)
+	        if (!objectId.IsValid || objectId.IsNull || objectId.IsErased)
 		        return null;
 
             // Start a transaction
@@ -198,7 +198,7 @@ namespace Extensions.AutoCAD
 		        var trans = ongoingTransaction ?? StartTransaction();
 
 		        foreach (ObjectId objectId in collection)
-			        if (!objectId.IsNull && !objectId.IsErased)
+			        if (objectId.IsValid && !objectId.IsNull)
 				        dbCollection.Add(trans.GetObject(objectId, OpenMode.ForRead));
 
 		        if (ongoingTransaction is null)
@@ -322,7 +322,7 @@ namespace Extensions.AutoCAD
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
         public static TypedValue[] ReadXData(this ObjectId objectId, string appName, Transaction ongoingTransaction = null)
         {
-	        if (objectId.IsNull || objectId.IsErased)
+	        if (!objectId.IsValid || objectId.IsNull || objectId.IsErased)
 		        return null;
 
 	        // Start a transaction
@@ -345,7 +345,7 @@ namespace Extensions.AutoCAD
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
         public static void SetXData(this ObjectId objectId, ResultBuffer data, Transaction ongoingTransaction = null)
         {
-	        if (objectId.IsNull || objectId.IsErased)
+	        if (!objectId.IsValid || objectId.IsNull || objectId.IsErased)
 		        return;
 
 	        // Start a transaction
@@ -517,7 +517,7 @@ namespace Extensions.AutoCAD
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
         public static void RegisterErasedEvent(this ObjectId objectId, ObjectErasedEventHandler handler, Transaction ongoingTransaction = null)
         {
-	        if (handler is null || objectId.IsNull || objectId.IsErased)
+	        if (handler is null || !objectId.IsValid || objectId.IsNull || objectId.IsErased)
 		        return;
 
 	        // Start a transaction
@@ -565,7 +565,7 @@ namespace Extensions.AutoCAD
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
         public static void UnregisterErasedEvent(this ObjectId objectId, ObjectErasedEventHandler handler, Transaction ongoingTransaction = null)
         {
-	        if (handler is null || objectId.IsNull || objectId.IsErased)
+	        if (handler is null || !objectId.IsValid || objectId.IsNull || objectId.IsErased)
 		        return;
 
 	        // Start a transaction
@@ -612,7 +612,7 @@ namespace Extensions.AutoCAD
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
         public static void Remove(this ObjectId obj, Transaction ongoingTransaction = null)
         {
-	        if (obj.IsNull || obj.IsErased)
+	        if (!obj.IsValid || obj.IsNull || obj.IsErased)
 		        return;
 
             // Start a transaction
@@ -917,7 +917,7 @@ namespace Extensions.AutoCAD
 		        var endPt = new Point3d(xCrd, yCrd, 0);
 
                 // Create the line
-                yield return new Line(start, endPt);
+                yield return new Line(start, endPt) { XData = line.XData };
 
 		        // Set the start point of the next line
 		        start = endPt;
@@ -967,7 +967,7 @@ namespace Extensions.AutoCAD
 			            };
 
 			            // Return the new solid
-			            yield return new Solid(newVerts[0], newVerts[1], newVerts[2], newVerts[3]);
+			            yield return new Solid(newVerts[0], newVerts[1], newVerts[2], newVerts[3]) { XData = solid.XData};
 		            }
 	            }
             }
