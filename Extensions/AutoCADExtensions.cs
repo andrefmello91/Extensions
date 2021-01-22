@@ -424,23 +424,23 @@ namespace Extensions.AutoCAD
         public static void CleanXData(this Entity entity) => entity.SetXData((ResultBuffer) null);
 
         /// <summary>
-        /// Add this <paramref name="dbObject"/> to the drawing.
+        /// Add this <paramref name="dbObject"/> to the drawing and return it's <see cref="ObjectId"/>.
         /// </summary>
         /// <param name="dbObject">The <see cref="DBObject"/>.</param>
         /// <param name="erasedEvent">The event to call if <paramref name="dbObject"/> is erased.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Add(this DBObject dbObject, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null) => ((Entity)dbObject).Add(erasedEvent, ongoingTransaction);
+        public static ObjectId AddToDrawing(this DBObject dbObject, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null) => ((Entity)dbObject).AddToDrawing(erasedEvent, ongoingTransaction);
 
         /// <summary>
-        /// Add this <paramref name="entity"/> to the drawing.
+        /// Add this <paramref name="entity"/> to the drawing and return it's <see cref="ObjectId"/>.
         /// </summary>
         /// <param name="entity">The <see cref="Entity"/>.</param>
         /// <param name="erasedEvent">The event to call if <paramref name="entity"/> is erased.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Add(this Entity entity, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null)
+        public static ObjectId AddToDrawing(this Entity entity, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null)
         {
 	        if (entity is null)
-		        return;
+		        return ObjectId.Null;
 
 	        // Start a transaction
 	        var trans = ongoingTransaction ?? StartTransaction();
@@ -459,29 +459,31 @@ namespace Extensions.AutoCAD
 		        entity.Erased += erasedEvent;
 
 	        // Commit changes
-	        if (ongoingTransaction != null)
-		        return;
+	        if (ongoingTransaction is null)
+	        {
+		        trans.Commit();
+		        trans.Dispose();
+	        }
 
-	        trans.Commit();
-	        trans.Dispose();
+	        return entity.ObjectId;
         }
 
         /// <summary>
-        /// Add the <paramref name="objects"/> in this collection to the drawing.
+        /// Add the <paramref name="objects"/> in this collection to the drawing and return the collection of <see cref="ObjectId"/>'s.
         /// </summary>
         /// <param name="erasedEvent">The event to call if <paramref name="objects"/> are erased.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Add(this IEnumerable<DBObject> objects, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null) => objects?.Cast<Entity>().Add(erasedEvent, ongoingTransaction);
+        public static IEnumerable<ObjectId> AddToDrawing(this IEnumerable<DBObject> objects, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null) => objects?.Cast<Entity>().AddToDrawing(erasedEvent, ongoingTransaction);
 
         /// <summary>
-        /// Add the <paramref name="entities"/> in this collection to the drawing.
+        /// Add the <paramref name="entities"/> in this collection to the drawing and return the collection of <see cref="ObjectId"/>'s.
         /// </summary>
         /// <param name="erasedEvent">The event to call if <paramref name="entities"/> are erased.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Add(this IEnumerable<Entity> entities, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null)
+        public static IEnumerable<ObjectId> AddToDrawing(this IEnumerable<Entity> entities, ObjectErasedEventHandler erasedEvent = null, Transaction ongoingTransaction = null)
         {
 	        if (entities is null || !entities.Any())
-		        return;
+		        return null;
 
 	        // Start a transaction
 	        var trans = ongoingTransaction ?? StartTransaction();
@@ -492,6 +494,9 @@ namespace Extensions.AutoCAD
 	        // Open the Block table record Model space for write
 	        var blkTblRec = (BlockTableRecord) trans.GetObject(blkTbl[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
 
+            // Get a list to return
+            var list = new List<ObjectId>();
+
 	        // Add the objects to the drawing
 	        foreach (var ent in entities)
 	        {
@@ -500,14 +505,18 @@ namespace Extensions.AutoCAD
 
 		        if (erasedEvent != null)
 			        ent.Erased += erasedEvent;
+
+                list.Add(ent.ObjectId);
 	        }
 
 	        // Commit changes
-	        if (ongoingTransaction != null)
-		        return;
+	        if (ongoingTransaction is null)
+	        {
+		        trans.Commit();
+		        trans.Dispose();
+	        }
 
-	        trans.Commit();
-	        trans.Dispose();
+	        return list;
         }
 
         /// <summary>
@@ -610,7 +619,7 @@ namespace Extensions.AutoCAD
         /// Remove this object from drawing.
         /// </summary>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this ObjectId obj, Transaction ongoingTransaction = null)
+        public static void RemoveFromDrawing(this ObjectId obj, Transaction ongoingTransaction = null)
         {
 	        if (!obj.IsValid || obj.IsNull || obj.IsErased)
 		        return;
@@ -633,20 +642,20 @@ namespace Extensions.AutoCAD
         /// Remove this object from drawing.
         /// </summary>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this DBObject obj, Transaction ongoingTransaction = null) => obj?.ObjectId.Remove(ongoingTransaction);
+        public static void RemoveFromDrawing(this DBObject obj, Transaction ongoingTransaction = null) => obj?.ObjectId.RemoveFromDrawing(ongoingTransaction);
 
         /// <summary>
         /// Remove this <paramref name="entity"/> from drawing.
         /// </summary>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this Entity entity, Transaction ongoingTransaction = null) => entity?.ObjectId.Remove(ongoingTransaction);
+        public static void RemoveFromDrawing(this Entity entity, Transaction ongoingTransaction = null) => entity?.ObjectId.RemoveFromDrawing(ongoingTransaction);
 
         /// <summary>
         /// Remove all the objects in this collection from drawing.
         /// </summary>
         /// <param name="objects">The collection containing the <see cref="ObjectId"/>'s to erase.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this IEnumerable<ObjectId> objects, Transaction ongoingTransaction = null)
+        public static void RemoveFromDrawing(this IEnumerable<ObjectId> objects, Transaction ongoingTransaction = null)
         {
 	        if (objects is null || !objects.Any())
 		        return;
@@ -655,7 +664,7 @@ namespace Extensions.AutoCAD
             var trans = ongoingTransaction ?? StartTransaction();
 
             foreach (var obj in objects)
-	            obj.Remove(trans);
+	            obj.RemoveFromDrawing(trans);
 
             // Commit changes
             if (ongoingTransaction != null)
@@ -670,33 +679,33 @@ namespace Extensions.AutoCAD
         /// </summary>
         /// <param name="objects">The collection containing the <see cref="DBObject"/>'s to erase.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this IEnumerable<DBObject> objects, Transaction ongoingTransaction = null) => objects?.GetObjectIds()?.Remove(ongoingTransaction);
+        public static void RemoveFromDrawing(this IEnumerable<DBObject> objects, Transaction ongoingTransaction = null) => objects?.GetObjectIds()?.RemoveFromDrawing(ongoingTransaction);
 
         /// <summary>
         /// Remove all the objects in this collection from drawing.
         /// </summary>
         /// <param name="objects">The <see cref="ObjectIdCollection"/> containing the objects to erase.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this ObjectIdCollection objects, Transaction ongoingTransaction = null) => objects?.Cast<ObjectId>().Remove(ongoingTransaction);
+        public static void RemoveFromDrawing(this ObjectIdCollection objects, Transaction ongoingTransaction = null) => objects?.Cast<ObjectId>().RemoveFromDrawing(ongoingTransaction);
 
         /// <summary>
         /// Erase all the objects in this <see cref="DBObjectCollection"/>.
         /// </summary>
         /// <param name="objects">The <see cref="DBObjectCollection"/> containing the objects to erase.</param>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this DBObjectCollection objects, Transaction ongoingTransaction = null) => objects?.ToObjectIdCollection()?.Remove(ongoingTransaction);
+        public static void RemoveFromDrawing(this DBObjectCollection objects, Transaction ongoingTransaction = null) => objects?.ToObjectIdCollection()?.RemoveFromDrawing(ongoingTransaction);
 
         /// <summary>
         /// Erase all the objects in this <paramref name="layerName"/>.
         /// </summary>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this string layerName, Transaction ongoingTransaction = null) => layerName.GetObjectIds()?.Remove(ongoingTransaction);
+        public static void RemoveFromDrawing(this string layerName, Transaction ongoingTransaction = null) => layerName.GetObjectIds()?.RemoveFromDrawing(ongoingTransaction);
 
         /// <summary>
         /// Erase all the objects in these <paramref name="layerNames"/>.
         /// </summary>
         /// <param name="ongoingTransaction">The ongoing <see cref="Transaction"/>. Commit latter if not null.</param>
-        public static void Remove(this IEnumerable<string> layerNames, Transaction ongoingTransaction = null) => layerNames.GetObjectIds()?.Remove(ongoingTransaction);
+        public static void RemoveFromDrawing(this IEnumerable<string> layerNames, Transaction ongoingTransaction = null) => layerNames.GetObjectIds()?.RemoveFromDrawing(ongoingTransaction);
 
         /// <summary>
         /// Move the objects in this collection to drawing bottom.
