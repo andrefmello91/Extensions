@@ -28,6 +28,16 @@ namespace Extensions
 		/// Event to run when an item is removed.
 		/// </summary>
 		public event EventHandler<ItemEventArgs<T>> ItemRemoved;
+
+		/// <summary>
+		/// Event to run when a range of items is added.
+		/// </summary>
+		public event EventHandler<RangeEventArgs<T>> RangeAdded;
+
+		/// <summary>
+		/// Event to run when a range of items is removed.
+		/// </summary>
+		public event EventHandler<RangeEventArgs<T>> RangeRemoved;
 		#endregion
 
 		/// <summary>
@@ -57,9 +67,15 @@ namespace Extensions
 			RaiseCountEvent(CountChanged);
 			RaiseItemEvent(ItemAdded, item);
 		}
+
+		/// <summary>
+		/// Adds an item without raising list event.
+		/// </summary>
+		public void AddBase(T item) => base.Add(item);
+		
 		//------------------------------------------------------------------
 		/// <summary>
-		/// Adds a range
+		/// Adds a range of items.
 		/// </summary>
 		public new void AddRange(IEnumerable<T> collection)
 		{
@@ -69,19 +85,34 @@ namespace Extensions
 
 			RaiseCountEvent(CountChanged);
 
-			for (int i = 0; i < collection.Count(); i++)
-				RaiseItemEvent(ItemAdded, collection.ElementAt(i), origCount + i);
+			RaiseRangeEvent(RangeAdded, collection);
 		}
+
+		/// <summary>
+		/// Adds a range of items without raising events.
+		/// </summary>
+		public void AddRangeBase(IEnumerable<T> collection) => base.AddRange(collection);
+
 		//------------------------------------------------------------------
 		/// <summary>
 		/// Clears the list.
 		/// </summary>
 		public new void Clear()
 		{
+			// Get the initial collection
+			var list = this.ToList();
+
 			base.Clear();
 
 			RaiseCountEvent(CountChanged);
+			RaiseRangeEvent(RangeRemoved, list);
 		}
+
+		/// <summary>
+		/// Clears the list without raising events.
+		/// </summary>
+		public void ClearBase() => base.Clear();
+
 		//------------------------------------------------------------------
 		/// <summary>
 		/// Removes the first matched item.
@@ -101,6 +132,31 @@ namespace Extensions
 		}
 
 		/// <summary>
+		/// Removes the first matched item without raising events.
+		/// </summary>
+		public void RemoveBase(T item) => base.Remove(item);
+
+		/// <summary>
+		/// Remove all the items that match a predicate.
+		/// </summary>
+		public new void RemoveAll(Predicate<T> match)
+		{
+			// Get the items
+			var removed = this.Where(t => match(t)).ToList();
+
+			base.RemoveAll(match);
+
+			RaiseRangeEvent(RangeRemoved, removed);
+
+			RaiseCountEvent(CountChanged);
+		}
+
+		/// <summary>
+		/// Remove all the items that match a predicate without raising events.
+		/// </summary>
+		public void RemoveAllBase(Predicate<T> match) => base.RemoveAll(match);
+
+		/// <summary>
 		/// Raise the count event.
 		/// </summary>
 		private void RaiseCountEvent(EventHandler<CountChangedEventArgs> eventHandler)
@@ -118,6 +174,16 @@ namespace Extensions
 			// Copy to a temporary variable to be thread-safe (MSDN).
 			var tmp = eventHandler;
 			tmp?.Invoke(this, new ItemEventArgs<T>(item, index ?? Count - 1));;
+		}
+
+		/// <summary>
+		/// Raise the range event.
+		/// </summary>
+		private void RaiseRangeEvent(EventHandler<RangeEventArgs<T>> eventHandler, IEnumerable<T> collection)
+		{
+			// Copy to a temporary variable to be thread-safe (MSDN).
+			var tmp = eventHandler;
+			tmp?.Invoke(this, new RangeEventArgs<T>(collection));;
 		}
 		#endregion
 		//------------------------------------------------------------------
@@ -142,10 +208,27 @@ namespace Extensions
 	    public int Index { get; set; }
 
 	    //----------------------------------------------------------
-	    public ItemEventArgs(T item, int index)
+	    public ItemEventArgs(T item, int index = -1)
 	    {
 		    Item  = item;
 		    Index = index;
+	    }
+    }
+
+    /// <summary>
+    /// Range EventArgs.
+    /// </summary>
+    public class RangeEventArgs<T> : EventArgs
+    {
+	    /// <summary>
+	    /// The item collection.
+	    /// </summary>
+	    public List<T> ItemCollection { get; set; }
+
+	    //----------------------------------------------------------
+	    public RangeEventArgs(IEnumerable<T> collection)
+	    {
+		    ItemCollection = collection.ToList();
 	    }
     }
 
