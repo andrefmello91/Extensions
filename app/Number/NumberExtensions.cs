@@ -5,9 +5,9 @@ using MathNet.Numerics;
 using UnitsNet;
 using UnitsNet.Units;
 
-namespace Extensions.Number
+namespace Extensions
 {
-    public static partial class Extensions
+    public static partial class NumberExtensions
     {
 	    /// <summary>
         /// Return the absolute value of this <paramref name="number"/>.

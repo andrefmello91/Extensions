@@ -1,21 +1,21 @@
-﻿using Extensions.Number;
+﻿using System.Collections.Generic;
+using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
-namespace Extensions.LinearAlgebra
+
+namespace Extensions
 {
-    public static class MatricesAndVectors
+    public static class LinearAlgebra
     {
         /// <summary>
-        /// Convert this <paramref name="array"/> to a <see cref="Vector"/>.
+        /// Convert this <paramref name="collection"/> to a <see cref="Vector"/>.
         /// </summary>
-        /// <param name="array"></param>
-	    public static Vector<double> ToVector(this double[] array) => Vector<double>.Build.DenseOfArray(array);
+	    public static Vector<double> ToVector(this IEnumerable<double> collection) => Vector<double>.Build.DenseOfArray(collection.ToArray());
 
         /// <summary>
         /// Convert this <paramref name="array"/> to a <see cref="Matrix"/>.
         /// </summary>
-        /// <param name="array"></param>
 	    public static Matrix<double> ToMatrix(this double[,] array) => Matrix<double>.Build.DenseOfArray(array);
 
         /// <summary>

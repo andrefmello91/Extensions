@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.29424.173
+VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "Extensions.csproj", "{70944E9C-5603-4721-870F-1D24DB5CDB3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "Extensions.csproj", "{ED36F760-76FF-435C-90EC-42DF521B74A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{70944E9C-5603-4721-870F-1D24DB5CDB3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{70944E9C-5603-4721-870F-1D24DB5CDB3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{70944E9C-5603-4721-870F-1D24DB5CDB3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{70944E9C-5603-4721-870F-1D24DB5CDB3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED36F760-76FF-435C-90EC-42DF521B74A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED36F760-76FF-435C-90EC-42DF521B74A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED36F760-76FF-435C-90EC-42DF521B74A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED36F760-76FF-435C-90EC-42DF521B74A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {8EFBC2E5-8005-4C82-8992-7FFC2B638780}
+		SolutionGuid = {14473CF7-21BC-41F7-89EB-91C595A2537E}
 	EndGlobalSection
 EndGlobal
