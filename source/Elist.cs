@@ -472,5 +472,6 @@ namespace Extensions
 		public CountChangedEventArgs(int count) => Count = count;
 
 		#endregion
+
 	}
 }
