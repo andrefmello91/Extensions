@@ -80,5 +80,83 @@ namespace Extensions
 
         /// <inheritdoc cref="Abbrev(LengthUnit)"/>
         public static string Abbrev(this AreaUnit unit) => Area.GetAbbreviation(unit);
+
+        /// <summary>
+        ///     Get the <see cref="AreaUnit"/> based on <paramref name="unit"/>.
+        /// </summary>
+        /// <remarks>
+        ///     If <paramref name="unit"/> is <see cref="LengthUnit.Millimeter"/> or <see cref="LengthUnit.Centimeter"/>, <see cref="AreaUnit.SquareMillimeter"/> or <see cref="AreaUnit.SquareCentimeter"/> are returned; else <see cref="AreaUnit.SquareMeter"/> is returned.
+        /// </remarks>
+        public static AreaUnit GetAreaUnit(this LengthUnit unit) =>
+	        unit switch
+	        {
+		        LengthUnit.Millimeter => AreaUnit.SquareMillimeter,
+		        LengthUnit.Centimeter => AreaUnit.SquareCentimeter,
+		        _ => AreaUnit.SquareMeter
+	        };
+
+        /// <summary>
+        /// Get the minimum value between two <see cref="Length"/>'s.
+        /// </summary>
+        public static Length Min(Length length1, Length length2) =>
+	        length1 <= length2
+		        ? length1
+		        : length2;
+
+        /// <summary>
+        /// Get the maximum value between two <see cref="Length"/>'s.
+        /// </summary>
+        public static Length Max(Length length1, Length length2) =>
+	        length1 >= length2
+		        ? length1
+		        : length2;
+
+        /// <summary>
+        /// Get the minimum value between two <see cref="Force"/>'s.
+        /// </summary>
+        public static Force Min(Force force1, Force force2) =>
+	        force1 <= force2
+		        ? force1
+		        : force2;
+
+        /// <summary>
+        /// Get the maximum value between two <see cref="Force"/>'s.
+        /// </summary>
+        public static Force Max(Force force1, Force force2) =>
+	        force1 >= force2
+		        ? force1
+		        : force2;
+
+        /// <summary>
+        /// Get the minimum value between two <see cref="Area"/>'s.
+        /// </summary>
+        public static Area Min(Area area1, Area area2) =>
+	        area1 <= area2
+		        ? area1
+		        : area2;
+
+        /// <summary>
+        /// Get the maximum value between two <see cref="Area"/>'s.
+        /// </summary>
+        public static Area Max(Area area1, Area area2) =>
+	        area1 >= area2
+		        ? area1
+		        : area2;
+
+        /// <summary>
+        /// Get the minimum value between two <see cref="Pressure"/>'s.
+        /// </summary>
+        public static Pressure Min(Pressure pressure1, Pressure pressure2) =>
+	        pressure1 <= pressure2
+		        ? pressure1
+		        : pressure2;
+
+        /// <summary>
+        /// Get the maximum value between two <see cref="Pressure"/>'s.
+        /// </summary>
+        public static Pressure Max(Pressure pressure1, Pressure pressure2) =>
+	        pressure1 >= pressure2
+		        ? pressure1
+		        : pressure2;
     }
 }
