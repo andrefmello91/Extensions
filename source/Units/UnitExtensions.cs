@@ -1,4 +1,5 @@
-﻿using UnitsNet;
+﻿using MathNet.Numerics;
+using UnitsNet;
 using UnitsNet.Units;
 
 namespace Extensions
@@ -158,5 +159,31 @@ namespace Extensions
 	        pressure1 >= pressure2
 		        ? pressure1
 		        : pressure2;
+
+        /// <summary>
+        ///     Verify if this <see cref="Length"/> is finite.
+        /// </summary>
+        /// <remarks>
+        ///     Returns Zero if the value is <see cref="double.NaN"/>, <see cref="double.PositiveInfinity"/> or <see cref="double.NegativeInfinity"/>.
+        /// </remarks>
+        public static Length ToZero(this Length length) => length.Value.IsFinite() ? length : Length.Zero;
+
+        /// <summary>
+        ///     Verify if this <see cref="Area"/> is finite.
+        /// </summary>
+        /// <inheritdoc cref="ToZero(Length)"/>
+        public static Area ToZero(this Area area) => area.Value.IsFinite() ? area : Area.Zero;
+
+        /// <summary>
+        ///     Verify if this <see cref="Force"/> is finite.
+        /// </summary>
+        /// <inheritdoc cref="ToZero(Length)"/>
+        public static Force ToZero(this Force force) => force.Value.IsFinite() ? force : Force.Zero;
+
+        /// <summary>
+        ///     Verify if this <see cref="Pressure"/> is finite.
+        /// </summary>
+        /// <inheritdoc cref="ToZero(Length)"/>
+        public static Pressure ToZero(this Pressure pressure) => pressure.Value.IsFinite() ? pressure : Pressure.Zero;
     }
 }
