@@ -11,359 +11,7 @@ namespace Extensions
 	/// <typeparam name="T">Any type.</typeparam>
 	public class EList<T> : List<T>
 	{
-		#region Constructors
-
-		/// <summary>
-		///     Create a new empty <see cref="EList{T}" />.
-		/// </summary>
-		public EList()
-		{
-		}
-
-		/// <summary>
-		///     Create a new <see cref="EList{T}" /> from a <paramref name="collection" />.
-		/// </summary>
-		public EList(IEnumerable<T> collection)
-			: base(collection)
-		{
-		}
-
-		#endregion
-
-		#region
-
-		/// <inheritdoc cref="List{T}.Add" />
-		public new void Add(T item)
-		{
-			base.Add(item);
-
-			RaiseCountEvent(CountChanged);
-			RaiseItemEvent(ItemAdded, item);
-		}
-
-		/// <summary>
-		///     <inheritdoc cref="Add" />
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		public void AddBase(T item) => base.Add(item);
-
-		//------------------------------------------------------------------
-		/// <inheritdoc cref="List{T}.AddRange" />
-		public new void AddRange(IEnumerable<T> collection)
-		{
-			base.AddRange(collection);
-
-			RaiseCountEvent(CountChanged);
-
-			RaiseRangeEvent(RangeAdded, collection);
-		}
-
-		/// <summary>
-		///     <inheritdoc cref="AddRange" />
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		public void AddRangeBase(IEnumerable<T> collection) => base.AddRange(collection);
-
-		/// <summary>
-		///     Add an object and sort this list.
-		/// </summary>
-		/// <param name="item">
-		///     <inheritdoc cref="Add" />
-		/// </param>
-		/// <param name="comparer">
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		/// </param>
-		public void AddAndSort(T item, IComparer<T> comparer = null)
-		{
-			Add(item);
-
-			if (comparer is null)
-				Sort();
-			else
-				Sort(comparer);
-		}
-
-		/// <summary>
-		///     Add an object and sort this list.
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		/// <param name="item">
-		///     <inheritdoc cref="Add" />
-		/// </param>
-		/// <param name="comparer">
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		/// </param>
-		public void AddAndSortBase(T item, IComparer<T> comparer = null)
-		{
-			AddBase(item);
-
-			if (comparer is null)
-				SortBase();
-			else
-				SortBase(comparer);
-		}
-
-		/// <summary>
-		///     Add a collection of objects and sort this list.
-		/// </summary>
-		/// <param name="collection">
-		///     <inheritdoc cref="AddRange" />
-		/// </param>
-		/// <param name="comparer">
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		/// </param>
-		public void AddRangeAndSort(IEnumerable<T> collection, IComparer<T> comparer = null)
-		{
-			AddRange(collection);
-
-			if (comparer is null)
-				Sort();
-			else
-				Sort(comparer);
-		}
-
-		/// <summary>
-		///     Add a collection of objects and sort this list.
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		/// <param name="collection">
-		///     <inheritdoc cref="AddRange" />
-		/// </param>
-		/// <param name="comparer">
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		/// </param>
-		public void AddRangeAndSortBase(IEnumerable<T> collection, IComparer<T> comparer = null)
-		{
-			AddRangeBase(collection);
-
-			if (comparer is null)
-				SortBase();
-			else
-				SortBase(comparer);
-		}
-
-		//------------------------------------------------------------------
-		/// <inheritdoc cref="List{T}.Clear" />
-		public new void Clear()
-		{
-			// Get the initial collection
-			var list = this.ToList();
-
-			base.Clear();
-
-			RaiseCountEvent(CountChanged);
-			RaiseRangeEvent(RangeRemoved, list);
-		}
-
-		/// <summary>
-		///     <inheritdoc cref="Clear" />
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		public void ClearBase() => base.Clear();
-
-		//------------------------------------------------------------------
-		/// <inheritdoc cref="List{T}.Remove" />
-		public new bool Remove(T item)
-		{
-			var index = IndexOf(item);
-
-			var removed = base.Remove(item);
-
-			if (removed)
-			{
-				RaiseCountEvent(CountChanged);
-				RaiseItemEvent(ItemRemoved, item, index);
-			}
-
-			return removed;
-		}
-
-		/// <summary>
-		///     <inheritdoc cref="Remove" />
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		public bool RemoveBase(T item) => base.Remove(item);
-
-		//------------------------------------------------------------------
-		/// <summary>
-		///     Remove an item and sort this list.
-		/// </summary>
-		/// <param name="item">
-		///     <inheritdoc cref="Remove" />
-		/// </param>
-		/// <param name="comparer">
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		/// </param>
-		public bool RemoveAndSort(T item, IComparer<T> comparer = null)
-		{
-			var removed = Remove(item);
-
-			if (comparer is null)
-				Sort();
-			else
-				Sort(comparer);
-
-			return removed;
-		}
-
-		/// <summary>
-		///     Remove an item and sort this list.
-		/// </summary>
-		/// <para>This method doesn't raise events.</para>
-		/// <param name="item">
-		///     <inheritdoc cref="Remove" />
-		/// </param>
-		/// <param name="comparer">
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		/// </param>
-		public bool RemoveAndSortBase(T item, IComparer<T> comparer = null)
-		{
-			var removed = RemoveBase(item);
-
-			if (comparer is null)
-				SortBase();
-			else
-				SortBase(comparer);
-
-			return removed;
-		}
-
-		/// <inheritdoc cref="List{T}.RemoveAll" />
-		public new int RemoveAll(Predicate<T> match)
-		{
-			// Get the items
-			var removed = this.Where(t => match(t)).ToList();
-
-			var count = base.RemoveAll(match);
-
-			RaiseRangeEvent(RangeRemoved, removed);
-
-			RaiseCountEvent(CountChanged);
-
-			return count;
-		}
-
-		/// <summary>
-		///     <inheritdoc cref="RemoveAll" />
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		public int RemoveAllBase(Predicate<T> match) => base.RemoveAll(match);
-
-		/// <summary>
-		///     Remove all the items that match a predicate and sort this list.
-		/// </summary>
-		/// <param name="match">
-		///     <inheritdoc cref="RemoveAll" />
-		/// </param>
-		/// <param name="comparer">
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		/// </param>
-		public int RemoveAllAndSort(Predicate<T> match, IComparer<T> comparer = null)
-		{
-			var count = RemoveAll(match);
-
-			if (comparer is null)
-				Sort();
-			else
-				Sort(comparer);
-
-			return count;
-		}
-
-		/// <summary>
-		///     Remove all the items that match a predicate and sort this list.
-		/// </summary>
-		/// <para>This method doesn't raise events.</para>
-		/// <param name="match">
-		///     <inheritdoc cref="RemoveAll" />
-		/// </param>
-		/// <param name="comparer">
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		/// </param>
-		public int RemoveAllAndSortBase(Predicate<T> match, IComparer<T> comparer = null)
-		{
-			var count = RemoveAllBase(match);
-
-			if (comparer is null)
-				SortBase();
-			else
-				SortBase(comparer);
-
-			return count;
-		}
-
-		/// <inheritdoc cref="List{T}.Sort()" />
-		public new void Sort()
-		{
-			base.Sort();
-
-			RaiseSortEvent(ListSorted);
-		}
-
-		/// <inheritdoc cref="List{T}.Sort(IComparer{T})" />
-		public new void Sort(IComparer<T> comparer)
-		{
-			base.Sort(comparer);
-
-			RaiseSortEvent(ListSorted);
-		}
-
-		/// <summary>
-		///     <inheritdoc cref="Sort()" />
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		public void SortBase() => base.Sort();
-
-		/// <summary>
-		///     <inheritdoc cref="Sort(IComparer{T})" />
-		///     <para>This method doesn't raise events.</para>
-		/// </summary>
-		public void SortBase(IComparer<T> comparer) => base.Sort(comparer);
-
-		/// <summary>
-		///     Raise the count event.
-		/// </summary>
-		private void RaiseCountEvent(EventHandler<CountChangedEventArgs> eventHandler)
-		{
-			// Copy to a temporary variable to be thread-safe (MSDN).
-			var tmp = eventHandler;
-			tmp?.Invoke(this, new CountChangedEventArgs(Count));
-		}
-
-		/// <summary>
-		///     Raise the item event.
-		/// </summary>
-		private void RaiseItemEvent(EventHandler<ItemEventArgs<T>> eventHandler, T item, int? index = null)
-		{
-			// Copy to a temporary variable to be thread-safe (MSDN).
-			var tmp = eventHandler;
-			tmp?.Invoke(this, new ItemEventArgs<T>(item, index ?? Count - 1));
-			;
-		}
-
-		/// <summary>
-		///     Raise the range event.
-		/// </summary>
-		private void RaiseRangeEvent(EventHandler<RangeEventArgs<T>> eventHandler, IEnumerable<T> collection)
-		{
-			// Copy to a temporary variable to be thread-safe (MSDN).
-			var tmp = eventHandler;
-			tmp?.Invoke(this, new RangeEventArgs<T>(collection));
-			;
-		}
-
-		/// <summary>
-		///     Raise the sort event.
-		/// </summary>
-		private void RaiseSortEvent(EventHandler eventHandler)
-		{
-			// Copy to a temporary variable to be thread-safe (MSDN).
-			var tmp = eventHandler;
-			tmp?.Invoke(this, new EventArgs());
-			;
-		}
-
-		#endregion
+		#region Events
 
 		/// <summary>
 		///     Event to run when the list count changes.
@@ -394,6 +42,208 @@ namespace Extensions
 		///     Event to run when the list is sorted.
 		/// </summary>
 		public event EventHandler ListSorted;
+
+		#endregion
+
+		#region Properties
+
+		/// <summary>
+		///     Allow duplicate items in this list.
+		/// </summary>
+		/// <remarks>
+		///     If false, an item is not added if this list contains it.
+		/// </remarks>
+		public bool AllowDuplicates { get; set; } = false;
+
+		#endregion
+
+		#region Constructors
+
+		/// <summary>
+		///     Create a new empty <see cref="EList{T}" />.
+		/// </summary>
+		public EList()
+		{
+		}
+
+		/// <summary>
+		///     Create a new <see cref="EList{T}" /> from a <paramref name="collection" />.
+		/// </summary>
+		public EList(IEnumerable<T> collection)
+			: base(collection)
+		{
+		}
+
+		#endregion
+
+		#region  Methods
+
+		/// <inheritdoc cref="List{T}.Add" />
+		/// <param name="raiseEvents">Raise events after adding?</param>
+		/// <param name="sort">Sort this list after adding?</param>
+		public void Add(T item, bool raiseEvents = true, bool sort = true)
+		{
+			if (!AllowDuplicates && Contains(item))
+				return;
+
+			base.Add(item);
+
+			if (raiseEvents)
+			{
+				RaiseCountEvent(CountChanged);
+				RaiseItemEvent(ItemAdded, item);
+			}
+
+			if (sort)
+				Sort(raiseEvents);
+		}
+
+		/// <inheritdoc cref="List{T}.AddRange" />
+		/// <inheritdoc cref="Add" />
+		public void AddRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true)
+		{
+			var toAdd = AllowDuplicates ? collection : collection.Where(t => !Contains(t));
+
+			base.AddRange(toAdd);
+
+			if (raiseEvents)
+			{
+				RaiseCountEvent(CountChanged);
+				RaiseRangeEvent(RangeAdded, toAdd);
+			}
+
+			if (sort)
+				Sort(raiseEvents);
+		}
+
+		//------------------------------------------------------------------
+		/// <inheritdoc cref="List{T}.Clear" />
+		/// <inheritdoc cref="Add" />
+		public void Clear(bool raiseEvents = true)
+		{
+			// Get the initial collection
+			var list = this.ToList();
+
+			base.Clear();
+
+			if (!raiseEvents)
+				return;
+
+			RaiseCountEvent(CountChanged);
+			RaiseRangeEvent(RangeRemoved, list);
+		}
+
+		//------------------------------------------------------------------
+		/// <inheritdoc cref="List{T}.Remove" />
+		/// <inheritdoc cref="Add" />
+		public bool Remove(T item, bool raiseEvents = true, bool sort = true)
+		{
+			var index = IndexOf(item);
+
+			if (!base.Remove(item))
+				return false;
+
+			if (raiseEvents)
+			{
+				RaiseCountEvent(CountChanged);
+				RaiseItemEvent(ItemRemoved, item, index);
+			}
+
+			if (sort)
+				Sort(raiseEvents);
+
+			return true;
+		}
+
+		/// <inheritdoc cref="List{T}.RemoveAll" />
+		/// <inheritdoc cref="Add" />
+		public int RemoveAll(Predicate<T> match, bool raiseEvents = true, bool sort = true)
+		{
+			// Get the items
+			var removed = this.Where(t => match(t)).ToList();
+
+			var count = base.RemoveAll(match);
+
+			if (raiseEvents)
+			{
+				RaiseRangeEvent(RangeRemoved, removed);
+				RaiseCountEvent(CountChanged);
+			}
+
+			if (sort)
+				Sort(raiseEvents);
+
+			return count;
+		}
+
+		/// <summary>
+		///     Remove all of the items in this list that match any item in <paramref name="collection" />.
+		/// </summary>
+		/// <param name="collection">The collection of items to remove.</param>
+		/// <inheritdoc cref="Add" />
+		public int RemoveRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true) => RemoveAll(collection.Contains, raiseEvents, sort);
+
+		/// <inheritdoc cref="List{T}.Sort()" />
+		/// <inheritdoc cref="Add(T, bool, bool)" />
+		public void Sort(bool raiseEvents = true)
+		{
+			base.Sort();
+
+			if (raiseEvents)
+				RaiseSortEvent(ListSorted);
+		}
+
+		/// <inheritdoc cref="List{T}.Sort(IComparer{T})" />
+		/// <inheritdoc cref="Add(T, bool, bool)" />
+		public void Sort(IComparer<T> comparer, bool raiseEvents = true)
+		{
+			base.Sort(comparer);
+
+			if (raiseEvents)
+				RaiseSortEvent(ListSorted);
+		}
+
+		/// <summary>
+		///     Raise the count event.
+		/// </summary>
+		private void RaiseCountEvent(EventHandler<CountChangedEventArgs> eventHandler)
+		{
+			// Copy to a temporary variable to be thread-safe (MSDN).
+			var tmp = eventHandler;
+			tmp?.Invoke(this, new CountChangedEventArgs(Count));
+		}
+
+		/// <summary>
+		///     Raise the item event.
+		/// </summary>
+		private void RaiseItemEvent(EventHandler<ItemEventArgs<T>> eventHandler, T item, int? index = null)
+		{
+			// Copy to a temporary variable to be thread-safe (MSDN).
+			var tmp = eventHandler;
+			tmp?.Invoke(this, new ItemEventArgs<T>(item, index ?? Count - 1));
+		}
+
+		/// <summary>
+		///     Raise the range event.
+		/// </summary>
+		private void RaiseRangeEvent(EventHandler<RangeEventArgs<T>> eventHandler, IEnumerable<T> collection)
+		{
+			// Copy to a temporary variable to be thread-safe (MSDN).
+			var tmp = eventHandler;
+			tmp?.Invoke(this, new RangeEventArgs<T>(collection));
+		}
+
+		/// <summary>
+		///     Raise the sort event.
+		/// </summary>
+		private void RaiseSortEvent(EventHandler eventHandler)
+		{
+			// Copy to a temporary variable to be thread-safe (MSDN).
+			var tmp = eventHandler;
+			tmp?.Invoke(this, new EventArgs());
+		}
+
+		#endregion
 
 		//---------------------------------------------------------------
 		//------------------------------------------------------------------
@@ -472,6 +322,5 @@ namespace Extensions
 		public CountChangedEventArgs(int count) => Count = count;
 
 		#endregion
-
 	}
 }
