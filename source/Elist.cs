@@ -102,7 +102,7 @@ namespace Extensions
 		/// <inheritdoc cref="Add" />
 		public void AddRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true)
 		{
-			var toAdd = AllowDuplicates ? collection : collection.Where(t => !Contains(t));
+			var toAdd = AllowDuplicates ? collection : collection.Distinct().Where(t => !Contains(t));
 
 			base.AddRange(toAdd);
 
