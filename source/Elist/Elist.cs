@@ -9,7 +9,7 @@ namespace Extensions
 	///     <para>https://www.codeproject.com/Articles/31539/List-With-Events</para>
 	/// </summary>
 	/// <typeparam name="T">Any type.</typeparam>
-	public class EList<T> : List<T>
+	public class EList<T> : List<T>, IEList<T>
 	{
 		#region Events
 
@@ -78,9 +78,6 @@ namespace Extensions
 
 		#region  Methods
 
-		/// <inheritdoc cref="List{T}.Add" />
-		/// <param name="raiseEvents">Raise events after adding?</param>
-		/// <param name="sort">Sort this list after adding?</param>
 		public void Add(T item, bool raiseEvents = true, bool sort = true)
 		{
 			if (!AllowDuplicates && Contains(item))
@@ -98,8 +95,6 @@ namespace Extensions
 				Sort(raiseEvents);
 		}
 
-		/// <inheritdoc cref="List{T}.AddRange" />
-		/// <inheritdoc cref="Add" />
 		public void AddRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true)
 		{
 			var toAdd = AllowDuplicates ? collection : collection.Distinct().Where(t => !Contains(t));
@@ -116,9 +111,6 @@ namespace Extensions
 				Sort(raiseEvents);
 		}
 
-		//------------------------------------------------------------------
-		/// <inheritdoc cref="List{T}.Clear" />
-		/// <inheritdoc cref="Add" />
 		public void Clear(bool raiseEvents = true)
 		{
 			// Get the initial collection
@@ -133,9 +125,6 @@ namespace Extensions
 			RaiseRangeEvent(RangeRemoved, list);
 		}
 
-		//------------------------------------------------------------------
-		/// <inheritdoc cref="List{T}.Remove" />
-		/// <inheritdoc cref="Add" />
 		public bool Remove(T item, bool raiseEvents = true, bool sort = true)
 		{
 			var index = IndexOf(item);
@@ -155,8 +144,6 @@ namespace Extensions
 			return true;
 		}
 
-		/// <inheritdoc cref="List{T}.RemoveAll" />
-		/// <inheritdoc cref="Add" />
 		public int RemoveAll(Predicate<T> match, bool raiseEvents = true, bool sort = true)
 		{
 			// Get the items
@@ -176,15 +163,8 @@ namespace Extensions
 			return count;
 		}
 
-		/// <summary>
-		///     Remove all of the items in this list that match any item in <paramref name="collection" />.
-		/// </summary>
-		/// <param name="collection">The collection of items to remove.</param>
-		/// <inheritdoc cref="Add" />
 		public int RemoveRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true) => RemoveAll(collection.Contains, raiseEvents, sort);
 
-		/// <inheritdoc cref="List{T}.Sort()" />
-		/// <inheritdoc cref="Add(T, bool, bool)" />
 		public void Sort(bool raiseEvents = true)
 		{
 			base.Sort();
@@ -193,8 +173,6 @@ namespace Extensions
 				RaiseSortEvent(ListSorted);
 		}
 
-		/// <inheritdoc cref="List{T}.Sort(IComparer{T})" />
-		/// <inheritdoc cref="Add(T, bool, bool)" />
 		public void Sort(IComparer<T> comparer, bool raiseEvents = true)
 		{
 			base.Sort(comparer);
@@ -247,80 +225,5 @@ namespace Extensions
 
 		//---------------------------------------------------------------
 		//------------------------------------------------------------------
-	}
-
-	/// <summary>
-	///     Item EventArgs.
-	/// </summary>
-	public class ItemEventArgs<T> : EventArgs
-	{
-		#region Properties
-
-		/// <summary>
-		///     The index of <see cref="Item" />.
-		/// </summary>
-		public int Index { get; set; }
-
-		/// <summary>
-		///     The item.
-		/// </summary>
-		public T Item { get; set; }
-
-		#endregion
-
-		#region Constructors
-
-		//----------------------------------------------------------
-		public ItemEventArgs(T item, int index = -1)
-		{
-			Item  = item;
-			Index = index;
-		}
-
-		#endregion
-	}
-
-	/// <summary>
-	///     Range EventArgs.
-	/// </summary>
-	public class RangeEventArgs<T> : EventArgs
-	{
-		#region Properties
-
-		/// <summary>
-		///     The item collection.
-		/// </summary>
-		public List<T> ItemCollection { get; set; }
-
-		#endregion
-
-		#region Constructors
-
-		//----------------------------------------------------------
-		public RangeEventArgs(IEnumerable<T> collection) => ItemCollection = collection.ToList();
-
-		#endregion
-	}
-
-	/// <summary>
-	///     Count changed EventArgs.
-	/// </summary>
-	public class CountChangedEventArgs : EventArgs
-	{
-		#region Properties
-
-		/// <summary>
-		///     Number of elements in the list.
-		/// </summary>
-		public int Count { get; set; }
-
-		#endregion
-
-		#region Constructors
-
-		//----------------------------------------------------------
-		public CountChangedEventArgs(int count) => Count = count;
-
-		#endregion
 	}
 }
