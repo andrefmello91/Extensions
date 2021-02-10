@@ -10,7 +10,7 @@ namespace Extensions
 	/// UnitConvertible interface.
 	/// </summary>
 	/// <typeparam name="T1">
-	///     The struct that represents the value of the object.
+	///     The type that represents the value of the object.
 	/// </typeparam>
 	/// <typeparam name="T2">
 	///     The enum of unit that represents the object.
