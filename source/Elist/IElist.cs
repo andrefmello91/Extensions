@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace Extensions
 {
 	/// <summary>
@@ -44,28 +46,22 @@ namespace Extensions
 
 		#endregion
 
-		#region Properties
-
-		/// <summary>
-		///     Allow duplicate items in this list.
-		/// </summary>
-		/// <remarks>
-		///     If false, an item is not added if this list contains it.
-		/// </remarks>
-		bool AllowDuplicates { get; set; }
-
-		#endregion
-
 		#region  Methods
 
+		/// <returns>
+		///		True if <paramref name="item"/> is added to this list; otherwise, false.
+		/// </returns>
 		/// <inheritdoc cref="List{T}.Add" />
 		/// <param name="raiseEvents">Raise events after modifying this list?</param>
 		/// <param name="sort">Sort this list after modifying this list?</param>
-		void Add(T item, bool raiseEvents = true, bool sort = true);
+		bool Add(T item, bool raiseEvents = true, bool sort = true);
 
+		/// <returns>
+		///		The number of items added to this list.
+		/// </returns>
 		/// <inheritdoc cref="List{T}.AddRange" />
 		/// <inheritdoc cref="Add" />
-		void AddRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true);
+		int AddRange(IEnumerable<T>? collection, bool raiseEvents = true, bool sort = true);
 
 		//------------------------------------------------------------------
 		/// <inheritdoc cref="List{T}.Clear" />
@@ -77,16 +73,19 @@ namespace Extensions
 		/// <inheritdoc cref="Add" />
 		bool Remove(T item, bool raiseEvents = true, bool sort = true);
 
-		/// <inheritdoc cref="List{T}.RemoveAll" />
+		/// <returns>
+		///		The number of items removed from this list.
+		/// </returns>
 		/// <inheritdoc cref="Add" />
+		/// <inheritdoc cref="List{T}.RemoveAll" />
 		int RemoveAll(Predicate<T> match, bool raiseEvents = true, bool sort = true);
 
 		/// <summary>
 		///     Remove all of the items in this list that match any item in <paramref name="collection" />.
 		/// </summary>
 		/// <param name="collection">The collection of items to remove.</param>
-		/// <inheritdoc cref="Add" />
-		int RemoveRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true);
+		/// <inheritdoc cref="RemoveAll" />
+		int RemoveRange(IEnumerable<T>? collection, bool raiseEvents = true, bool sort = true);
 
 		/// <inheritdoc cref="List{T}.Sort()" />
 		/// <inheritdoc cref="Add(T, bool, bool)" />

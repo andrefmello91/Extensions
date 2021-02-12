@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
+
 namespace Extensions
 {
 	/// <summary>
@@ -55,6 +57,14 @@ namespace Extensions
 		/// </remarks>
 		public bool AllowDuplicates { get; set; } = false;
 
+		/// <summary>
+		///     Allow null items in this list.
+		/// </summary>
+		/// <remarks>
+		///     If false, an item is not added if it is null.
+		/// </remarks>
+		public bool AllowNull { get; set; } = false;
+
 		#endregion
 
 		#region Constructors
@@ -78,10 +88,10 @@ namespace Extensions
 
 		#region  Methods
 
-		public void Add(T item, bool raiseEvents = true, bool sort = true)
+		public bool Add(T item, bool raiseEvents = true, bool sort = true)
 		{
-			if (!AllowDuplicates && Contains(item))
-				return;
+			if (!AllowDuplicates && Contains(item) || !AllowNull && item is null)
+				return false;
 
 			base.Add(item);
 
@@ -93,11 +103,27 @@ namespace Extensions
 
 			if (sort)
 				Sort(raiseEvents);
+
+			return true;
 		}
 
-		public void AddRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true)
+		public int AddRange(IEnumerable<T>? collection, bool raiseEvents = true, bool sort = true)
 		{
-			var toAdd = AllowDuplicates ? collection : collection.Distinct().Where(t => !Contains(t));
+			if (collection is null || !collection.Any())
+				return 0;
+
+			// Check duplicates
+			var toAdd =
+			(
+				AllowDuplicates
+					? collection
+					: collection.Distinct().Where(t => !Contains(t))
+			).ToList();
+
+			// Check null
+			toAdd = AllowNull
+				? toAdd
+				: toAdd.Where(t => !(t is null)).ToList();
 
 			base.AddRange(toAdd);
 
@@ -109,6 +135,8 @@ namespace Extensions
 
 			if (sort)
 				Sort(raiseEvents);
+
+			return toAdd.Count;
 		}
 
 		public void Clear(bool raiseEvents = true)
@@ -163,7 +191,10 @@ namespace Extensions
 			return count;
 		}
 
-		public int RemoveRange(IEnumerable<T> collection, bool raiseEvents = true, bool sort = true) => RemoveAll(collection.Contains, raiseEvents, sort);
+		public int RemoveRange(IEnumerable<T>? collection, bool raiseEvents = true, bool sort = true) =>
+			collection is null || !collection.Any()
+				? 0
+				: RemoveAll(collection.Contains, raiseEvents, sort);
 
 		public void Sort(bool raiseEvents = true)
 		{

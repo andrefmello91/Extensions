@@ -54,6 +54,32 @@ namespace Extensions
 		bool Approaches(T1 other, T2 tolerance);
 	}
 
+	/// <typeparam name="T2">The type that represents an object that can be compared to <see cref="T1"/>.</typeparam>
+	/// <typeparam name="T3">The type that represents the tolerance to compare objects.</typeparam>
+	/// <inheritdoc cref="IApproachable{T1,T2}"/>
+	public interface IApproachable<in T1, in T2, in T3>
+	{
+		/// <inheritdoc cref="IApproachable{T1,T2}.Approaches"/>
+		bool Approaches(T1 other, T3 tolerance);
+
+		/// <inheritdoc cref="IApproachable{T1,T2}.Approaches"/>
+		bool Approaches(T2 other, T3 tolerance);
+	}
+
+	/// <summary>
+	///		Interface to compare an object with two different types.
+	/// </summary>
+	/// <typeparam name="T1">Any type.</typeparam>
+	/// <typeparam name="T2">Any type.</typeparam>
+	public interface IEquatable<in T1, in T2>
+	{
+		/// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
+		bool Equals(T1 other);
+
+		/// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
+		bool Equals(T2 other);
+	}
+
 	/// <summary>
 	/// Cloneable interface with generic type.
 	/// </summary>
