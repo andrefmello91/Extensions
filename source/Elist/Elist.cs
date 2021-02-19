@@ -100,7 +100,7 @@ namespace Extensions
 				RaiseCountEvent(CountChanged);
 				RaiseItemEvent(ItemAdded, item);
 			}
-
+			
 			if (sort)
 				Sort(raiseEvents);
 
