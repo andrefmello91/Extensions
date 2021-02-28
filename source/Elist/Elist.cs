@@ -10,40 +10,41 @@ namespace Extensions
 	///     Extended list class with events. Implementation by CodeProject:
 	///     <para>https://www.codeproject.com/Articles/31539/List-With-Events</para>
 	/// </summary>
-	/// <typeparam name="T">Any type.</typeparam>
+	/// <inheritdoc cref="IEList{T}"/>
 	public class EList<T> : List<T>, IEList<T>
+		where T : IEquatable<T>, IComparable<T>
 	{
 		#region Events
 
 		/// <summary>
 		///     Event to run when the list count changes.
 		/// </summary>
-		public event EventHandler<CountChangedEventArgs> CountChanged;
+		public event EventHandler<CountChangedEventArgs>? CountChanged;
 
 		/// <summary>
 		///     Event to run when an item is added.
 		/// </summary>
-		public event EventHandler<ItemEventArgs<T>> ItemAdded;
+		public event EventHandler<ItemEventArgs<T>>? ItemAdded;
 
 		/// <summary>
 		///     Event to run when an item is removed.
 		/// </summary>
-		public event EventHandler<ItemEventArgs<T>> ItemRemoved;
+		public event EventHandler<ItemEventArgs<T>>? ItemRemoved;
 
 		/// <summary>
 		///     Event to run when a range of items is added.
 		/// </summary>
-		public event EventHandler<RangeEventArgs<T>> RangeAdded;
+		public event EventHandler<RangeEventArgs<T>>? RangeAdded;
 
 		/// <summary>
 		///     Event to run when a range of items is removed.
 		/// </summary>
-		public event EventHandler<RangeEventArgs<T>> RangeRemoved;
+		public event EventHandler<RangeEventArgs<T>>? RangeRemoved;
 
 		/// <summary>
 		///     Event to run when the list is sorted.
 		/// </summary>
-		public event EventHandler ListSorted;
+		public event EventHandler? ListSorted;
 
 		#endregion
 
@@ -55,7 +56,7 @@ namespace Extensions
 		/// <remarks>
 		///     If false, an item is not added if this list contains it.
 		/// </remarks>
-		public bool AllowDuplicates { get; set; } = false;
+		public bool AllowDuplicates { get; set; }
 
 		/// <summary>
 		///     Allow null items in this list.
@@ -63,25 +64,47 @@ namespace Extensions
 		/// <remarks>
 		///     If false, an item is not added if it is null.
 		/// </remarks>
-		public bool AllowNull { get; set; } = false;
+		public bool AllowNull { get; set; }
 
 		#endregion
 
 		#region Constructors
 
+		/// <inheritdoc cref="EList{T}(bool, bool)"/>
+		public EList()
+			: this (false)
+		{
+		}
+
 		/// <summary>
 		///     Create a new empty <see cref="EList{T}" />.
 		/// </summary>
-		public EList()
+		/// <param name="allowDuplicates">Allow duplicate items in this list?</param>
+		/// <param name="allowNull">Allow null items in this list?</param>
+		public EList(bool allowDuplicates = false, bool allowNull = false)
+			: base()
 		{
+			AllowDuplicates = allowDuplicates;
+			AllowNull       = allowNull;
 		}
 
 		/// <summary>
 		///     Create a new <see cref="EList{T}" /> from a <paramref name="collection" />.
 		/// </summary>
-		public EList(IEnumerable<T> collection)
-			: base(collection)
+		/// <inheritdoc cref="EList{T}(bool, bool)"/>
+		public EList(IEnumerable<T> collection, bool allowDuplicates = false, bool allowNull = false)
+			: this(allowDuplicates, allowNull)
 		{
+			var items = (allowDuplicates
+				? collection
+				: collection.Distinct())
+				.ToArray();
+
+			items = (allowNull
+				? items
+				: items.Where(v => !(v is null)).ToArray());
+
+			AddRange(items, false, false);
 		}
 
 		#endregion

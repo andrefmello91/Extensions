@@ -9,8 +9,9 @@ namespace Extensions
 	///     Extended list class with events. Implementation by CodeProject:
 	///     <para>https://www.codeproject.com/Articles/31539/List-With-Events</para>
 	/// </summary>
-	/// <typeparam name="T">Any type.</typeparam>
+	/// <typeparam name="T">Any type that implements <seealso cref="IEquatable{T}"/> and <see cref="IComparable{T}"/>.</typeparam>
 	public interface IEList<T> : IList<T>
+		where T : IEquatable<T>, IComparable<T>
 	{
 		#region Events
 
@@ -76,8 +77,8 @@ namespace Extensions
 		/// <returns>
 		///		The number of items removed from this list.
 		/// </returns>
-		/// <inheritdoc cref="Add" />
 		/// <inheritdoc cref="List{T}.RemoveAll" />
+		/// <inheritdoc cref="Add" />
 		int RemoveAll(Predicate<T> match, bool raiseEvents = true, bool sort = true);
 
 		/// <summary>

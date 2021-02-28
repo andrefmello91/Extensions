@@ -93,7 +93,7 @@ namespace Extensions
 	        {
 		        LengthUnit.Millimeter => AreaUnit.SquareMillimeter,
 		        LengthUnit.Centimeter => AreaUnit.SquareCentimeter,
-		        _ => AreaUnit.SquareMeter
+		        _                     => AreaUnit.SquareMeter
 	        };
 
         /// <summary>
