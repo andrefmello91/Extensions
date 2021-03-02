@@ -4,7 +4,7 @@
 // Source:
 // https://gist.github.com/Sergio0694/eb988b243dd4a720a66fe369b63e5b08.
 
-#if NETSTANDARD2_0 || NETFRAMEWORK
+#if NETSTANDARD2_0
 
 namespace System.Diagnostics.CodeAnalysis
 {
@@ -18,7 +18,7 @@ namespace System.Diagnostics.CodeAnalysis
 
     /// <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
-    internal sealed class MaybeNullAttribute : Attribute { }
+    public sealed class MaybeNullAttribute : Attribute { }
 
     /// <summary>Specifies that an output will not be null even if the corresponding type allows it. Specifies that an input argument was not null when the call returns.</summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]

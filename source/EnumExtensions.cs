@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Extensions
 {
@@ -13,13 +14,11 @@ namespace Extensions
 		public static TAttribute? GetAttribute<TAttribute>(this Enum value)
 			where TAttribute : Attribute
 		{
-			var type = value.GetType();
-			var name = Enum.GetName(type, value);
-			return
-				type.GetField(name!)?
-				.GetCustomAttributes(false)
-				.OfType<TAttribute>()
-				.SingleOrDefault();
+            var type = value.GetType();
+
+            return
+                type.GetField(value.ToString())?
+                    .GetCustomAttribute<TAttribute>();
 		}
 	}
 }
