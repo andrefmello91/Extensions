@@ -93,19 +93,8 @@ namespace Extensions
 		/// </summary>
 		/// <inheritdoc cref="EList{T}(bool, bool)"/>
 		public EList(IEnumerable<T> collection, bool allowDuplicates = false, bool allowNull = false)
-			: this(allowDuplicates, allowNull)
-		{
-			var items = (allowDuplicates
-				? collection
-				: collection.Distinct())
-				.ToArray();
-
-			items = (allowNull
-				? items
-				: items.Where(v => !(v is null)).ToArray());
-
-			AddRange(items, false, false);
-		}
+			: this(allowDuplicates, allowNull) =>
+			AddRange(collection, false, false);
 
 		#endregion
 
@@ -135,31 +124,34 @@ namespace Extensions
 			if (collection is null || !collection.Any())
 				return 0;
 
-			// Check duplicates
-			var toAdd =
-			(
-				AllowDuplicates
-					? collection
-					: collection.Distinct().Where(t => !Contains(t))
-			).ToList();
+			// Add each permitted item
+			var added = collection.Where(item => Add(item, false, false)).ToList();
 
-			// Check null
-			toAdd = AllowNull
-				? toAdd
-				: toAdd.Where(t => !(t is null)).ToList();
+			//// Check duplicates
+			//var toAdd =
+			//(
+			//	AllowDuplicates
+			//		? collection
+			//		: collection.Distinct().Where(t => !Contains(t))
+			//).ToList();
 
-			base.AddRange(toAdd);
+			//// Check null
+			//toAdd = AllowNull
+			//	? toAdd
+			//	: toAdd.Where(t => !(t is null)).ToList();
+
+			//base.AddRange(toAdd);
 
 			if (raiseEvents)
 			{
 				RaiseCountEvent(CountChanged);
-				RaiseRangeEvent(RangeAdded, toAdd);
+				RaiseRangeEvent(RangeAdded, added);
 			}
 
 			if (sort)
 				Sort(raiseEvents);
 
-			return toAdd.Count;
+			return added.Count;
 		}
 
 		public void Clear(bool raiseEvents = true)
@@ -238,7 +230,7 @@ namespace Extensions
 		/// <summary>
 		///     Raise the count event.
 		/// </summary>
-		private void RaiseCountEvent(EventHandler<CountChangedEventArgs> eventHandler)
+		private void RaiseCountEvent(EventHandler<CountChangedEventArgs>? eventHandler)
 		{
 			// Copy to a temporary variable to be thread-safe (MSDN).
 			var tmp = eventHandler;
@@ -248,7 +240,7 @@ namespace Extensions
 		/// <summary>
 		///     Raise the item event.
 		/// </summary>
-		private void RaiseItemEvent(EventHandler<ItemEventArgs<T>> eventHandler, T item, int? index = null)
+		private void RaiseItemEvent(EventHandler<ItemEventArgs<T>>? eventHandler, T item, int? index = null)
 		{
 			// Copy to a temporary variable to be thread-safe (MSDN).
 			var tmp = eventHandler;
@@ -258,7 +250,7 @@ namespace Extensions
 		/// <summary>
 		///     Raise the range event.
 		/// </summary>
-		private void RaiseRangeEvent(EventHandler<RangeEventArgs<T>> eventHandler, IEnumerable<T> collection)
+		private void RaiseRangeEvent(EventHandler<RangeEventArgs<T>>? eventHandler, IEnumerable<T> collection)
 		{
 			// Copy to a temporary variable to be thread-safe (MSDN).
 			var tmp = eventHandler;
@@ -268,7 +260,7 @@ namespace Extensions
 		/// <summary>
 		///     Raise the sort event.
 		/// </summary>
-		private void RaiseSortEvent(EventHandler eventHandler)
+		private void RaiseSortEvent(EventHandler? eventHandler)
 		{
 			// Copy to a temporary variable to be thread-safe (MSDN).
 			var tmp = eventHandler;
