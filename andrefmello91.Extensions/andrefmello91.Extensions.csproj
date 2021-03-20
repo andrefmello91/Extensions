@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+      <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+      <LangVersion>9.0</LangVersion>
+      <Nullable>enable</Nullable>
+      <PackageId>andrefmello91.Extensions</PackageId>
+      <Version>0.1</Version>
+      <Authors>andrefmello91</Authors>
+      <PackageDescription>Personal extensions.</PackageDescription>
+      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+      <PackageVersion>0.1</PackageVersion>
+      <Description>Extensions for MathNet, UnitsNET and other classes.</Description>
+      <PackageProjectUrl>https://github.com/andrefmello91/Extensions</PackageProjectUrl>
+      <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+      <AssemblyName>andrefmello91.Extensions</AssemblyName>
+      <RootNamespace>andrefmello91.Extensions</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
+    <PackageReference Include="UnitsNet" Version="4.86.0" />
+  </ItemGroup>
+
+</Project>

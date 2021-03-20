@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+// For use with netstandard2.0
 // Source:
 // https://gist.github.com/Sergio0694/eb988b243dd4a720a66fe369b63e5b08.
 
