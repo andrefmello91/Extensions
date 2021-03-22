@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: PublishGitHub  
-      uses: brandedoutcast/publish-nuget@v2.5.2  
+      uses: Rebel028/publish-nuget@2.6.1  
       with:   
        PROJECT_FILE_PATH: andrefmello91.Extensions/andrefmello91.Extensions.csproj
        NUGET_SOURCE: https://nuget.pkg.github.com/andrefmello91
