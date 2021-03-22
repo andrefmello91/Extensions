@@ -5,14 +5,15 @@
       <LangVersion>9.0</LangVersion>
       <Nullable>enable</Nullable>
       <PackageId>andrefmello91.Extensions</PackageId>
-      <Version>0.1</Version>
+      <Version>0.1.1</Version>
       <Authors>andrefmello91</Authors>
       <PackageDescription>Personal extensions.</PackageDescription>
       <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-      <PackageVersion>0.1</PackageVersion>
+      <PackageVersion>0.1.1</PackageVersion>
       <Description>Extensions for MathNet, UnitsNET and other classes.</Description>
+      <RepositoryUrl>https://github.com/andrefmello91/Extensions</RepositoryUrl>
       <PackageProjectUrl>https://github.com/andrefmello91/Extensions</PackageProjectUrl>
-      <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+      <PackageReleaseNotes>Initial pre-release.</PackageReleaseNotes>
       <AssemblyName>andrefmello91.Extensions</AssemblyName>
       <RootNamespace>andrefmello91.Extensions</RootNamespace>
   </PropertyGroup>
