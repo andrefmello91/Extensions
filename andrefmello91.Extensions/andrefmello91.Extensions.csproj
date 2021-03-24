@@ -5,15 +5,17 @@
       <LangVersion>9.0</LangVersion>
       <Nullable>enable</Nullable>
       <PackageId>andrefmello91.Extensions</PackageId>
-      <Version>1.0.1</Version>
+      <Version>1.0.2</Version>
       <Authors>andrefmello91</Authors>
       <PackageDescription>Personal extensions.</PackageDescription>
       <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-      <PackageVersion>1.0.1</PackageVersion>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+      <PackageVersion>1.0.2</PackageVersion>
       <Description>Extensions for MathNet, UnitsNET and other classes.</Description>
       <RepositoryUrl>https://github.com/andrefmello91/Extensions</RepositoryUrl>
       <PackageProjectUrl>https://github.com/andrefmello91/Extensions</PackageProjectUrl>
-      <PackageReleaseNotes>Added matrix square checking.</PackageReleaseNotes>
+      <PackageReleaseNotes>Added documentation to package.</PackageReleaseNotes>
       <AssemblyName>andrefmello91.Extensions</AssemblyName>
       <RootNamespace>andrefmello91.Extensions</RootNamespace>
   </PropertyGroup>
