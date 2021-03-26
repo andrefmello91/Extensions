@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Extensions
+namespace andrefmello91.Extensions
 {
 	public static class EnumExtensions
 	{

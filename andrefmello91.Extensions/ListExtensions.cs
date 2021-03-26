@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace Extensions
+namespace andrefmello91.Extensions
 {
 	public static class ListExtensions
 	{

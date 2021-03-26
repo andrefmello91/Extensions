@@ -2,7 +2,7 @@
 using UnitsNet;
 using UnitsNet.Units;
 
-namespace Extensions
+namespace andrefmello91.Extensions
 {
     /// <summary>
     /// Extensions for <see cref="UnitsNet"/>.

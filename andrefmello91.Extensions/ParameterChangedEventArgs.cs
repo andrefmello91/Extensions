@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Extensions
+namespace andrefmello91.Extensions
 {
 	/// <summary>
 	/// Parameter changed class.

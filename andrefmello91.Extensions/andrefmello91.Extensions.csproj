@@ -5,17 +5,17 @@
       <LangVersion>9.0</LangVersion>
       <Nullable>enable</Nullable>
       <PackageId>andrefmello91.Extensions</PackageId>
-      <Version>1.0.2</Version>
+      <Version>1.0.3</Version>
       <Authors>andrefmello91</Authors>
       <PackageDescription>Personal extensions.</PackageDescription>
       <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-      <PackageVersion>1.0.2</PackageVersion>
+      <PackageVersion>1.0.3</PackageVersion>
       <Description>Extensions for MathNet, UnitsNET and other classes.</Description>
       <RepositoryUrl>https://github.com/andrefmello91/Extensions</RepositoryUrl>
       <PackageProjectUrl>https://github.com/andrefmello91/Extensions</PackageProjectUrl>
-      <PackageReleaseNotes>Added documentation to package.</PackageReleaseNotes>
+      <PackageReleaseNotes>Added comparison extensions.</PackageReleaseNotes>
       <AssemblyName>andrefmello91.Extensions</AssemblyName>
       <RootNamespace>andrefmello91.Extensions</RootNamespace>
   </PropertyGroup>

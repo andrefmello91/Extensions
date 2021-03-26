@@ -5,7 +5,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
 
-namespace Extensions
+namespace andrefmello91.Extensions
 {
     public static class LinearAlgebra
     {

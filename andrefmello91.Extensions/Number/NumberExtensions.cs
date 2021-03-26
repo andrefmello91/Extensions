@@ -5,7 +5,7 @@ using MathNet.Numerics;
 using UnitsNet;
 using UnitsNet.Units;
 
-namespace Extensions
+namespace andrefmello91.Extensions
 {
     public static partial class NumberExtensions
     {

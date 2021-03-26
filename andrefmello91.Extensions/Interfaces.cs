@@ -4,7 +4,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using UnitsNet;
 using UnitsNet.Units;
 
-namespace Extensions
+namespace andrefmello91.Extensions
 {
 	/// <summary>
 	/// UnitConvertible interface.
