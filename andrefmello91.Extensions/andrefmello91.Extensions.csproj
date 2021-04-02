@@ -4,25 +4,28 @@
       <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
       <LangVersion>9.0</LangVersion>
       <Nullable>enable</Nullable>
-      <PackageId>andrefmello91.Extensions</PackageId>
       <Version>1.0.4</Version>
       <Authors>andrefmello91</Authors>
-      <PackageDescription>Personal extensions.</PackageDescription>
-      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-      <PackageVersion>1.0.4</PackageVersion>
       <Description>Extensions for MathNet, UnitsNET and other classes.</Description>
       <RepositoryUrl>https://github.com/andrefmello91/Extensions</RepositoryUrl>
       <PackageProjectUrl>https://github.com/andrefmello91/Extensions</PackageProjectUrl>
-      <PackageReleaseNotes>Updated unit extensions with generic types.</PackageReleaseNotes>
       <AssemblyName>andrefmello91.Extensions</AssemblyName>
       <RootNamespace>andrefmello91.Extensions</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <PackageId>andrefmello91.Extensions</PackageId>
+        <PackageDescription>Personal extensions.</PackageDescription>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageVersion>1.0.4</PackageVersion>
+        <PackageReleaseNotes>Updated unit extensions with generic types.</PackageReleaseNotes>
+    </PropertyGroup>
+
+    <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
-    <PackageReference Include="UnitsNet" Version="4.86.0" />
+    <PackageReference Include="UnitsNet" Version="4.87.0" />
   </ItemGroup>
 
 </Project>
