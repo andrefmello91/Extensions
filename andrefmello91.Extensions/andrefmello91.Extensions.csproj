@@ -15,7 +15,7 @@
       <Description>Extensions for MathNet, UnitsNET and other classes.</Description>
       <RepositoryUrl>https://github.com/andrefmello91/Extensions</RepositoryUrl>
       <PackageProjectUrl>https://github.com/andrefmello91/Extensions</PackageProjectUrl>
-      <PackageReleaseNotes>Added comparison extensions.</PackageReleaseNotes>
+      <PackageReleaseNotes>Updated unit extensions with generic types.</PackageReleaseNotes>
       <AssemblyName>andrefmello91.Extensions</AssemblyName>
       <RootNamespace>andrefmello91.Extensions</RootNamespace>
   </PropertyGroup>
