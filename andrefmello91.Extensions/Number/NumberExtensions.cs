@@ -56,9 +56,12 @@ namespace andrefmello91.Extensions
 		public static double Round(this double number, int digits = 2) => Math.Round(number, digits);
 
 		/// <summary>
-		/// Return zero if <paramref name="number"/> is <see cref="double.NaN"/> or <see cref="double.PositiveInfinity"/> or <see cref="double.NegativeInfinity"/>.
+		/// Correct this <paramref name="number"/> to a finite value.
 		/// </summary>
-		public static double ToZero(this double number) => number.IsFinite() ? number : 0;
+		/// <returns>
+		/// The <paramref name="number"/> itself if it's not <see cref="double.NaN"/> or infinity, otherwise zero.
+		/// </returns>
+		public static double AsFinite(this double number) => number.IsFinite() ? number : 0;
 
 		/// <summary>
         /// Returns true if <paramref name="number"/> is approximately zero, in given <paramref name="tolerance"/>.
