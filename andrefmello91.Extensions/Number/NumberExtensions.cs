@@ -102,13 +102,8 @@ namespace andrefmello91.Extensions
 		}
 
 		/// <summary>
-        /// Returns true if this <paramref name="number"/> is <see cref="double.NaN"/>.
+        /// Returns true if this <paramref name="collection"/> contains at least one <see cref="double.NaN"/> or Infinity".
         /// </summary>
-		public static bool IsNaN(this double number) => double.IsNaN(number);
-
-		/// <summary>
-        /// Returns true if this <paramref name="collection"/> contains at least one <see cref="double.NaN"/>.
-        /// </summary>
-		public static bool ContainsNaN(this IEnumerable<double> collection) => collection.Any(d => d.IsNaN());
+		public static bool ContainsNaNOrInfinity(this IEnumerable<double> collection) => collection.Any(d => !d.IsFinite());
     }
 }
