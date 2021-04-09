@@ -58,7 +58,7 @@ namespace andrefmello91.Extensions
 		/// <summary>
 		/// Return zero if <paramref name="number"/> is <see cref="double.NaN"/> or <see cref="double.PositiveInfinity"/> or <see cref="double.NegativeInfinity"/>.
 		/// </summary>
-		public static double ToZero(this double number) => !double.IsNaN(number) && !double.IsInfinity(number) ? number : 0;
+		public static double ToZero(this double number) => number.IsFinite() ? number : 0;
 
 		/// <summary>
         /// Returns true if <paramref name="number"/> is approximately zero, in given <paramref name="tolerance"/>.
