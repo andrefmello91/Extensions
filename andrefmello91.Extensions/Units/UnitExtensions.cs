@@ -63,7 +63,7 @@ namespace andrefmello91.Extensions
         public static IQuantity As(this int number, Enum unit) => ((double) number).As(unit);
         
         /// <inheritdoc cref="As(int, Enum)"/>
-        public static IQuantity As(this double number, Enum unit) => Quantity.From(number.IsFinite() ? number : 0, unit);
+        public static IQuantity As(this double number, Enum unit) => Quantity.From(number.ToZero(), unit);
         
         /// <summary>
         ///		Returns true if this quantity has positive value.
