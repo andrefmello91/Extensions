@@ -19,13 +19,13 @@
         <PackageId>andrefmello91.Extensions</PackageId>
         <PackageDescription>Personal extensions.</PackageDescription>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.0.5</PackageVersion>
-        <PackageReleaseNotes>Implemented As method for parsing doubles to units.</PackageReleaseNotes>
+        <PackageVersion>1.0.6</PackageVersion>
+        <PackageReleaseNotes>Implemented As method for parsing doubles to units and updated UnitsNet package.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
-    <PackageReference Include="UnitsNet" Version="4.87.0" />
+    <PackageReference Include="UnitsNet" Version="4.89.0" />
   </ItemGroup>
 
 </Project>
