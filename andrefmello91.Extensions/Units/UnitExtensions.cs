@@ -53,14 +53,18 @@ namespace andrefmello91.Extensions
 	        };
 
         /// <summary>
-        ///     Verify if this <see cref="Force"/> is finite.
+        ///		Create a quantity from this <paramref name="number"/>.
         /// </summary>
+        /// <param name="number">The number.</param>
+        /// <param name="unit">The unit type: <see cref="LengthUnit"/>, <see cref="AreaUnit"/>, <see cref="ForceUnit"/>.</param>
         /// <returns>
-        ///     Zero if the value is <see cref="double.NaN"/>, <see cref="double.PositiveInfinity"/> or <see cref="double.NegativeInfinity"/>.
+        ///		A quantity based in <paramref name="unit"/>. If <paramref name="number"/> is not finite, zero is returned.
         /// </returns>
-        public static TQuantity ToZero<TQuantity>(this TQuantity force) where TQuantity : IQuantity, new() =>
-	        force.Value.IsFinite() ? force : new TQuantity();
-
+        public static IQuantity As(this int number, Enum unit) => ((double) number).As(unit);
+        
+        /// <inheritdoc cref="As(int, Enum)"/>
+        public static IQuantity As(this double number, Enum unit) => Quantity.From(number.AsFinite(), unit);
+        
         /// <summary>
         ///		Returns true if this quantity has positive value.
         /// </summary>

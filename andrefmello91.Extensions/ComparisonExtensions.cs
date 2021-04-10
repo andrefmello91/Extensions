@@ -17,7 +17,7 @@ namespace andrefmello91.Extensions
 		public static bool IsEqualTo<TEquatable>(this TEquatable? object1, TEquatable? object2) 
 			where TEquatable : IEquatable<TEquatable> =>
 			object1 is null && object2 is null || 
-			!(object1 is null) && object1.Equals(object2);
+			object1 is not null && object1.Equals(object2);
 
 		/// <summary>
 		///		Check equality of two objects.
@@ -28,8 +28,8 @@ namespace andrefmello91.Extensions
 		/// </returns>
 		public static bool IsNotEqualTo<TEquatable>(this TEquatable? object1, TEquatable? object2) 
 			where TEquatable : IEquatable<TEquatable> =>
-			object1 is null && !(object2 is null) || 
-			!(object1 is null) && ( object2 is null || !object1.Equals(object2));
+			object1 is null && object2 is not null || 
+			object1 is not null && ( object2 is null || !object1.Equals(object2));
 
 		/// <summary>
 		///		Compare <paramref name="object1"/> to <paramref name="object2"/>.

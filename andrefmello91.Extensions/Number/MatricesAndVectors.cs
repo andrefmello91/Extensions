@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
@@ -20,9 +21,9 @@ namespace andrefmello91.Extensions
 	    public static Matrix<double> ToMatrix(this double[,] array) => Matrix<double>.Build.DenseOfArray(array);
 
         /// <summary>
-        /// Returns true if this <paramref name="matrix"/> contains at least one <see cref="double.NaN"/>.
+        /// Returns true if this <paramref name="matrix"/> contains at least one <see cref="double.NaN"/> of infinity.
         /// </summary>
-        public static bool ContainsNaN(this Matrix<double> matrix) => matrix.Exists(d => d.IsNaN());
+        public static bool ContainsNaN(this Matrix<double> matrix) => matrix.Exists(d => !d.IsFinite());
 		
         /// <summary>
         ///		Check if this <paramref name="matrix"/> is square.
