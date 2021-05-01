@@ -6,7 +6,6 @@
 // https://gist.github.com/Sergio0694/eb988b243dd4a720a66fe369b63e5b08.
 
 #if NETSTANDARD2_0
-
 namespace System.Diagnostics.CodeAnalysis
 {
     /// <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
