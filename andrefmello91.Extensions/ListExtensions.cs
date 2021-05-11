@@ -46,6 +46,26 @@ namespace andrefmello91.Extensions
 		}
 
 		/// <summary>
+		///		<inheritdoc cref="List{T}.RemoveRange"/>
+		/// </summary>
+		/// <param name="list">The <see cref="List{T}"/>.</param>
+		/// <param name="toRemove">The <see cref="Range"/> to remove.</param>
+		public static void RemoveRange<T>(this List<T> list, Range toRemove)
+		{
+			var start = toRemove.Start.IsFromEnd
+				? list.Count - toRemove.Start.Value
+				: toRemove.Start.Value;
+			
+			var end = toRemove.End.IsFromEnd
+				? list.Count - toRemove.End.Value
+				: toRemove.End.Value;
+
+			var count = (end - start).Abs();
+			
+			list.RemoveRange(start, count);
+		}
+
+		/// <summary>
 		///     Check if this collection is null or empty.
 		/// </summary>
 		/// <returns>
