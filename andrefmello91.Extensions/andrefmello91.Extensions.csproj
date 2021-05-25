@@ -4,7 +4,7 @@
       <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
       <LangVersion>9.0</LangVersion>
       <Nullable>enable</Nullable>
-      <Version>1.0.7</Version>
+      <Version>1.0.8</Version>
       <Authors>andrefmello91</Authors>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -19,12 +19,12 @@
         <PackageId>andrefmello91.Extensions</PackageId>
         <PackageDescription>Personal extensions.</PackageDescription>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageReleaseNotes>Simplified IUnitConvertible interface.</PackageReleaseNotes>
+        <PackageReleaseNotes>Added string check for parsing numbers.</PackageReleaseNotes>
     </PropertyGroup>
         
     <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
-    <PackageReference Include="UnitsNet" Version="4.89.1" />
+    <PackageReference Include="UnitsNet" Version="4.92.1" />
   </ItemGroup>
     
     <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
