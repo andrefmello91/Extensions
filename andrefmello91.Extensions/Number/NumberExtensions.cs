@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
+using UnitsNet;
 
 namespace andrefmello91.Extensions
 {
@@ -49,9 +50,13 @@ namespace andrefmello91.Extensions
 		public static double AsFinite(this double number) => number.IsFinite() ? number : 0;
 
 		/// <summary>
-		///     Returns true if this <paramref name="collection" /> contains at least one <see cref="double.NaN" /> or Infinity".
+		///     Returns true if this <paramref name="collection" /> contains at least one <see cref="double.NaN" /> or Infinity.
 		/// </summary>
 		public static bool ContainsNaNOrInfinity(this IEnumerable<double> collection) => collection.Any(d => !d.IsFinite());
+		
+		/// <inheritdoc cref="ContainsNaNOrInfinity"/>
+		public static bool ContainsNaNOrInfinity<TQuantity>(this IEnumerable<TQuantity> collection)
+			where TQuantity : IQuantity => collection.Select(q => q.Value).ContainsNaNOrInfinity();
 
 		/// <summary>
 		///     Returns true if this <paramref name="number" /> is between two bounds, in any order.
