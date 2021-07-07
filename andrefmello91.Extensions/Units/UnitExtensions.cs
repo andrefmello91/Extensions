@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnitsNet;
 using UnitsNet.Units;
 
@@ -52,6 +54,91 @@ namespace andrefmello91.Extensions
 		/// <inheritdoc cref="As(int, Enum)" />
 		public static IQuantity As(this double number, Enum unit) => Quantity.From(number.AsFinite(), unit);
 
+		/// <summary>
+		///		Get values from this quantity collection.
+		/// </summary>
+		/// <param name="quantities">The quantity collection.</param>
+		/// <param name="unit">The required unit.</param>
+		public static IEnumerable<double> GetValues<TQuantity, TUnit>(this IEnumerable<TQuantity> quantities, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			quantities
+				.Select(q => q.As(unit));
+
+		/// <inheritdoc cref="GetValues{TQuantity,TUnit}(IEnumerable{TQuantity}, TUnit)"/>
+		/// <remarks>
+		///		This uses the unit of the first item of the collection.
+		/// </remarks>
+		public static IEnumerable<double> GetValues<TQuantity, TUnit>(this IEnumerable<TQuantity> quantities)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			quantities
+				.GetValues(quantities.First().Unit);
+
+		/// <summary>
+		///		Get quantities from a collection of doubles.
+		/// </summary>
+		/// <param name="values">The double collection.</param>
+		/// <param name="unit">The required unit.</param>
+		public static IEnumerable<TQuantity> GetQuantities<TQuantity, TUnit>(this IEnumerable<double> values, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			values
+				.Select(v => v.As(unit))
+				.Cast<TQuantity>();
+
+		/// <summary>
+		///		Get the array of values from a 2D array of quantities.
+		/// </summary>
+		/// <param name="quantities">The 2D array of quantities.</param>
+		/// <param name="unit">The required unit.</param>
+		public static double[,] GetValues<TQuantity, TUnit>(this TQuantity[,] quantities, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum
+		{
+			// Initiate array
+			var rows    = quantities.GetLength(0);
+			var columns = quantities.GetLength(1);
+			var dArray  = new double[rows, columns];
+			
+			for (var i = 0; i < rows; i++)
+			for (var j = 0; j < columns; j++)
+				dArray[i, j] = quantities[i, j].As(unit);
+
+			return dArray;
+		}
+
+		/// <inheritdoc cref="GetValues{TQuantity,TUnit}(TQuantity[,],TUnit)"/>
+		/// <remarks>
+		///		This uses the unit of the first item of the collection.
+		/// </remarks>
+		public static double[,] GetValues<TQuantity, TUnit>(this TQuantity[,] quantities)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			quantities.GetValues(quantities[0, 0].Unit);
+
+		/// <summary>
+		///		Get the array of quantities from a 2D array of doubles.
+		/// </summary>
+		/// <param name="values">The 2D array of doubles.</param>
+		/// <param name="unit">The required unit.</param>
+		public static TQuantity[,] GetQuantities<TQuantity, TUnit>(this double[,] values, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum
+		{
+			// Initiate array
+			var rows    = values.GetLength(0);
+			var columns = values.GetLength(1);
+			var dArray  = new TQuantity[rows, columns];
+			
+			for (var i = 0; i < rows; i++)
+			for (var j = 0; j < columns; j++)
+				dArray[i, j] = (TQuantity) values[i, j].As(unit);
+
+			return dArray;
+		}
+
+		
 		/// <summary>
 		///     Get the <see cref="AreaUnit" /> based on <paramref name="unit" />.
 		/// </summary>
