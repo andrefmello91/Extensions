@@ -80,18 +80,27 @@ namespace andrefmello91.Extensions
 		///  </summary>
 		///  <param name="array">The 2D array.</param>
 		///  <param name="columnIndex">The column index.</param>
-		public static IEnumerable<T> GetColumn<T>(this T[,] array, int columnIndex) =>
-			Enumerable.Range(0, array.GetLength(0))
-				.Select(x => array[x, columnIndex]);
+		public static IEnumerable<T> GetColumn<T>(this T[,] array, int columnIndex)
+		{
+			var rows = array.GetLength(0);
+
+			for (var i = 0; i < rows; i++)
+				yield return array[i, columnIndex];
+		}
 
 		///  <summary>
 		/// 		Get a row from a 2D array.
 		///  </summary>
 		///  <param name="array">The 2D array.</param>
 		/// <param name="rowIndex">The row index</param>
-		public static IEnumerable<T> GetRow<T>(this T[,] array, int rowIndex) =>
-			Enumerable.Range(0, array.GetLength(1))
-				.Select(x => array[rowIndex, x]);
+		public static IEnumerable<T> GetRow<T>(this T[,] array, int rowIndex) 		
+		{
+			var columns = array.GetLength(1);
+
+			for (var j = 0; j < columns; j++)
+				yield return array[rowIndex, j];
+		}
+
 
 		#endregion
 
