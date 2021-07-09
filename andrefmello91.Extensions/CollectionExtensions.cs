@@ -93,10 +93,10 @@ namespace andrefmello91.Extensions
 		///  </summary>
 		///  <param name="array">The 2D array.</param>
 		/// <param name="rowIndex">The row index</param>
-		public static IEnumerable<T> GetRow<T>(this T[,] array, int rowIndex) 		
+		public static IEnumerable<T> GetRow<T>(this T[,] array, int rowIndex)
 		{
 			var columns = array.GetLength(1);
-
+			
 			for (var j = 0; j < columns; j++)
 				yield return array[rowIndex, j];
 		}
