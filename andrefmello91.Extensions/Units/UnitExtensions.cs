@@ -169,6 +169,89 @@ namespace andrefmello91.Extensions
 			where TQuantity : IQuantity =>
 			quantity.Value > 0;
 
+		/// <inheritdoc cref="Negate{TQuantity,TUnit}(TQuantity)"/>
+		/// <param name="unit">The required unit.</param>
+		public static TQuantity Negate<TQuantity, TUnit>(this TQuantity quantity, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			(TQuantity) (-quantity.Value).As(unit);
+		
+		/// <summary>
+		///		Get this quantity with a negated value.
+		/// </summary>
+		public static TQuantity Negate<TQuantity, TUnit>(this TQuantity quantity)
+			where TQuantity : IQuantity<TUnit> 
+			where TUnit : Enum =>
+			quantity.Negate(quantity.Unit);
+		
+		/// <inheritdoc cref="Add{TQuantity,TUnit}(TQuantity,TQuantity)"/>
+		/// <param name="unit">The required unit.</param>
+		public static TQuantity Add<TQuantity, TUnit>(this TQuantity quantity, TQuantity other, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			(TQuantity) (quantity.As(unit) + other.As(unit)).As(unit);
+
+		/// <summary>
+		///		Get a quantity with a summed values.
+		/// </summary>
+		public static TQuantity Add<TQuantity, TUnit>(this TQuantity quantity, TQuantity other)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			quantity.Add(other, quantity.Unit);
+		
+		/// <inheritdoc cref="Subtract{TQuantity,TUnit}(TQuantity,TQuantity)"/>
+		/// <param name="unit">The required unit.</param>
+		public static TQuantity Subtract<TQuantity, TUnit>(this TQuantity quantity, TQuantity other, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			(TQuantity) (quantity.As(unit) - other.As(unit)).As(unit);
+
+		/// <summary>
+		///		Get a quantity with subtracted values.
+		/// </summary>
+		public static TQuantity Subtract<TQuantity, TUnit>(this TQuantity quantity, TQuantity other)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			quantity.Subtract(other, quantity.Unit);
+
+		/// <inheritdoc cref="Multiply{TQuantity,TUnit}(TQuantity,double)"/>
+		/// <param name="unit">The required unit.</param>
+		public static TQuantity Multiply<TQuantity, TUnit>(this TQuantity quantity, double multiplier, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			(TQuantity) (quantity.As(unit) * multiplier).As(unit);
+		
+		/// <summary>
+		///		Get a quantity multiplied by a double.
+		/// </summary>
+		public static TQuantity Multiply<TQuantity, TUnit>(this TQuantity quantity, double multiplier)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			quantity.Multiply(multiplier, quantity.Unit);
+
+		/// <inheritdoc cref="Divide{TQuantity,TUnit}(TQuantity,double)"/>
+		/// <param name="unit">The required unit.</param>
+		public static TQuantity Divide<TQuantity, TUnit>(this TQuantity quantity, double divisor, TUnit unit)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			(TQuantity) (quantity.As(unit) / divisor).As(unit);
+		
+		/// <summary>
+		///		Get a quantity divided by a double.
+		/// </summary>
+		public static TQuantity Divide<TQuantity, TUnit>(this TQuantity quantity, double divisor)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			quantity.Divide(divisor, quantity.Unit);
+
+		/// <summary>
+		///		Get a quantity divided by another quantity.
+		/// </summary>
+		public static double Divide<TQuantity, TUnit>(this TQuantity quantity, TQuantity divisor)
+			where TQuantity : IQuantity<TUnit>
+			where TUnit : Enum =>
+			quantity.Value / divisor.As(quantity.Unit);
+
 		#endregion
 
 	}
