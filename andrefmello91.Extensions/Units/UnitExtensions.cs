@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnitsNet;
 using UnitsNet.Units;
 
@@ -251,6 +252,33 @@ namespace andrefmello91.Extensions
 			where TQuantity : IQuantity<TUnit>
 			where TUnit : Enum =>
 			quantity.Value / divisor.As(quantity.Unit);
+
+		/// <summary>
+		///		Get the force unit associated to this force per length unit.
+		/// </summary>
+		/// <returns>
+		///		<see cref="ForceUnit"/>.
+		/// </returns>
+		public static ForceUnit GetForceUnit(this ForcePerLengthUnit unit) =>
+			(ForceUnit) Enum.Parse(typeof(ForceUnit), Regex.Split(unit.ToString(), "Per")[0]);
+		
+		/// <summary>
+		///		Get the lenght unit associated to this force per length unit.
+		/// </summary>
+		/// <returns>
+		///		<see cref="LengthUnit"/>.
+		/// </returns>
+		public static LengthUnit GetLenghtUnit(this ForcePerLengthUnit unit) =>
+			(LengthUnit) Enum.Parse(typeof(LengthUnit), Regex.Split(unit.ToString(), "Per")[1]);
+
+		/// <summary>
+		///		Get the force per length unit associated to this force unit and a length unit
+		/// </summary>
+		/// <returns>
+		///		<see cref="ForcePerLengthUnit"/>.
+		/// </returns>
+		public static ForcePerLengthUnit Per(this ForceUnit forceUnit, LengthUnit lengthUnit) =>
+			(ForcePerLengthUnit) Enum.Parse(typeof(ForcePerLengthUnit), $"{forceUnit}Per{lengthUnit}");
 
 		#endregion
 
