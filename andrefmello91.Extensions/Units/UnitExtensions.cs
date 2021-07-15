@@ -144,23 +144,23 @@ namespace andrefmello91.Extensions
 		///     Get the <see cref="AreaUnit" /> based on <paramref name="unit" />.
 		/// </summary>
 		/// <returns>
-		///		The square of <paramref name="unit"/>, or <see cref="AreaUnit.SquareMillimeter"/> if <paramref name="unit"/> cannot be parsed.
+		///		The square of <paramref name="unit"/>, or <see cref="AreaUnit.Undefined"/> if <paramref name="unit"/> cannot be parsed.
 		/// </returns>
 		public static AreaUnit GetAreaUnit(this LengthUnit unit) =>
 			Enum.TryParse<AreaUnit>($"Square{unit}", out var areaUnit)
 				? areaUnit
-				: AreaUnit.SquareMillimeter;
+				: AreaUnit.Undefined;
 		
 		/// <summary>
 		///     Get the <see cref="LengthUnit" /> based on <paramref name="unit" />.
 		/// </summary>
 		/// <returns>
-		///		The relative length unit, or <see cref="LengthUnit.Millimeter"/> if <paramref name="unit"/> cannot be parsed.
+		///		The relative length unit, or <see cref="LengthUnit.Undefined"/> if <paramref name="unit"/> cannot be parsed.
 		/// </returns>
 		public static LengthUnit GetLenghtUnit(this AreaUnit unit) =>
 			Enum.TryParse<LengthUnit>(Regex.Split(unit.ToString(), "Square")[1], out var lenghtUnit)
 				? lenghtUnit
-				: LengthUnit.Millimeter;
+				: LengthUnit.Undefined;
 
 		/// <summary>
 		///     Returns true if this quantity has negative value.
@@ -263,12 +263,12 @@ namespace andrefmello91.Extensions
 		///		Get the force unit associated to this force per length unit.
 		/// </summary>
 		/// <returns>
-		///		The relative force unit, or <see cref="ForceUnit.Newton"/> if <paramref name="unit"/> cannot be parsed.
+		///		The relative force unit, or <see cref="ForceUnit.Undefined"/> if <paramref name="unit"/> cannot be parsed.
 		/// </returns>
 		public static ForceUnit GetForceUnit(this ForcePerLengthUnit unit) =>
 			Enum.TryParse<ForceUnit>(Regex.Split(unit.ToString(), "Per")[0], out var forceUnit)
 				? forceUnit
-				: ForceUnit.Newton;
+				: ForceUnit.Undefined;
 		
 		/// <summary>
 		///		Get the lenght unit associated to this force per length unit.
@@ -277,18 +277,18 @@ namespace andrefmello91.Extensions
 		public static LengthUnit GetLenghtUnit(this ForcePerLengthUnit unit) =>
 			Enum.TryParse<LengthUnit>(Regex.Split(unit.ToString(), "Per")[1], out var lengthUnit)
 				? lengthUnit
-				: LengthUnit.Millimeter;
+				: LengthUnit.Undefined;
 
 		/// <summary>
 		///		Get the force per length unit associated to this force unit and a length unit
 		/// </summary>
 		/// <returns>
-		///		The relative force per length unit, or <see cref="ForcePerLengthUnit.NewtonPerMillimeter"/> if it cannot be parsed.
+		///		The relative force per length unit, or <see cref="ForcePerLengthUnit.Undefined"/> if it cannot be parsed.
 		/// </returns>
 		public static ForcePerLengthUnit Per(this ForceUnit forceUnit, LengthUnit lengthUnit) =>
 			Enum.TryParse<ForcePerLengthUnit>($"{forceUnit}Per{lengthUnit}", out var unit)
 				? unit
-				: ForcePerLengthUnit.NewtonPerMillimeter;
+				: ForcePerLengthUnit.Undefined;
 
 		#endregion
 
