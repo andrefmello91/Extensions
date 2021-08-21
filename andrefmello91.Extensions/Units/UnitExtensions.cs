@@ -290,6 +290,15 @@ namespace andrefmello91.Extensions
 				? unit
 				: ForcePerLengthUnit.Undefined;
 
+		/// <summary>
+		///     Returns true if this <paramref name="quantity" /> is between two bounds, in any order.
+		/// </summary>
+		/// <inheritdoc cref="NumberExtensions.IsBetween(double, double, double)"/>
+		public static bool IsBetween<TQuantity>(this TQuantity quantity, TQuantity bound1, TQuantity bound2)
+			where TQuantity : IQuantity, IComparable =>
+			quantity.Value >= UnitMath.Min(bound1, bound2).As(quantity.Unit) &&
+			quantity.Value <= UnitMath.Max(bound1, bound2).As(quantity.Unit);
+		
 		#endregion
 
 	}
