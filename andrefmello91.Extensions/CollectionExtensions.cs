@@ -45,24 +45,31 @@ namespace andrefmello91.Extensions
 			list.AddRange(toRetain);
 		}
 
-		/// <summary>
-		///		<inheritdoc cref="List{T}.RemoveRange"/>
-		/// </summary>
-		/// <param name="list">The <see cref="List{T}"/>.</param>
-		/// <param name="toRemove">The <see cref="Range"/> to remove.</param>
-		public static void RemoveRange<T>(this List<T> list, Range toRemove)
-		{
-			var start = toRemove.Start.IsFromEnd
-				? list.Count - toRemove.Start.Value
-				: toRemove.Start.Value;
-			
-			var end = toRemove.End.IsFromEnd
-				? list.Count - toRemove.End.Value
-				: toRemove.End.Value;
 
-			var count = (end - start).Abs();
-			
-			list.RemoveRange(start, count);
+		/// <summary>
+		///     Get a column from a 2D array.
+		/// </summary>
+		/// <param name="array">The 2D array.</param>
+		/// <param name="columnIndex">The column index.</param>
+		public static IEnumerable<T> GetColumn<T>(this T[,] array, int columnIndex)
+		{
+			var rows = array.GetLength(0);
+
+			for (var i = 0; i < rows; i++)
+				yield return array[i, columnIndex];
+		}
+
+		/// <summary>
+		///     Get a row from a 2D array.
+		/// </summary>
+		/// <param name="array">The 2D array.</param>
+		/// <param name="rowIndex">The row index</param>
+		public static IEnumerable<T> GetRow<T>(this T[,] array, int rowIndex)
+		{
+			var columns = array.GetLength(1);
+
+			for (var j = 0; j < columns; j++)
+				yield return array[rowIndex, j];
 		}
 
 		/// <summary>
@@ -74,33 +81,25 @@ namespace andrefmello91.Extensions
 		/// <typeparam name="T">Any type.</typeparam>
 		public static bool IsNullOrEmpty<T>([NotNullWhen(false)] this IEnumerable<T>? collection) => collection is null || !collection.Any();
 
-
-		///  <summary>
-		/// 		Get a column from a 2D array.
-		///  </summary>
-		///  <param name="array">The 2D array.</param>
-		///  <param name="columnIndex">The column index.</param>
-		public static IEnumerable<T> GetColumn<T>(this T[,] array, int columnIndex)
+		/// <summary>
+		///     <inheritdoc cref="List{T}.RemoveRange" />
+		/// </summary>
+		/// <param name="list">The <see cref="List{T}" />.</param>
+		/// <param name="toRemove">The <see cref="Range" /> to remove.</param>
+		public static void RemoveRange<T>(this List<T> list, Range toRemove)
 		{
-			var rows = array.GetLength(0);
+			var start = toRemove.Start.IsFromEnd
+				? list.Count - toRemove.Start.Value
+				: toRemove.Start.Value;
 
-			for (var i = 0; i < rows; i++)
-				yield return array[i, columnIndex];
+			var end = toRemove.End.IsFromEnd
+				? list.Count - toRemove.End.Value
+				: toRemove.End.Value;
+
+			var count = (end - start).Abs();
+
+			list.RemoveRange(start, count);
 		}
-
-		///  <summary>
-		/// 		Get a row from a 2D array.
-		///  </summary>
-		///  <param name="array">The 2D array.</param>
-		/// <param name="rowIndex">The row index</param>
-		public static IEnumerable<T> GetRow<T>(this T[,] array, int rowIndex)
-		{
-			var columns = array.GetLength(1);
-			
-			for (var j = 0; j < columns; j++)
-				yield return array[rowIndex, j];
-		}
-
 
 		#endregion
 

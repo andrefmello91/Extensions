@@ -53,8 +53,8 @@ namespace andrefmello91.Extensions
 		///     Returns true if this <paramref name="collection" /> contains at least one <see cref="double.NaN" /> or Infinity.
 		/// </summary>
 		public static bool ContainsNaNOrInfinity(this IEnumerable<double> collection) => collection.Any(d => !d.IsFinite());
-		
-		/// <inheritdoc cref="ContainsNaNOrInfinity"/>
+
+		/// <inheritdoc cref="ContainsNaNOrInfinity" />
 		public static bool ContainsNaNOrInfinity<TQuantity>(this IEnumerable<TQuantity> collection)
 			where TQuantity : IQuantity => collection.Select(q => q.Value).ContainsNaNOrInfinity();
 

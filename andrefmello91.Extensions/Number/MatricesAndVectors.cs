@@ -33,7 +33,7 @@ namespace andrefmello91.Extensions
 		public static Matrix<double> ToMatrix(this double[,] array) => Matrix<double>.Build.DenseOfArray(array);
 
 		/// <summary>
-		///     Convert this <paramref name="array" /> to a <see cref="Matrix" />, with components in <paramref name="unit"/>.
+		///     Convert this <paramref name="array" /> to a <see cref="Matrix" />, with components in <paramref name="unit" />.
 		/// </summary>
 		public static Matrix<double> ToMatrix<TQuantity, TUnit>(this TQuantity[,] array, TUnit unit)
 			where TQuantity : IQuantity<TUnit>
@@ -42,42 +42,41 @@ namespace andrefmello91.Extensions
 				.GetValues(unit)
 				.ToMatrix();
 
-		/// <inheritdoc cref="ToMatrix{TQuantity,TUnit}(TQuantity[,], TUnit)"/>
+		/// <inheritdoc cref="ToMatrix{TQuantity,TUnit}(TQuantity[,], TUnit)" />
 		/// <remarks>
-		///		This uses the unit of the matrix's first component.
+		///     This uses the unit of the matrix's first component.
 		/// </remarks>
 		public static Matrix<double> ToMatrix<TQuantity, TUnit>(this TQuantity[,] array)
 			where TQuantity : IQuantity<TUnit>
 			where TUnit : Enum =>
 			array.ToMatrix(array[0, 0].Unit);
-		
+
 		/// <summary>
 		///     Convert this <paramref name="collection" /> to a <see cref="Vector" />.
 		/// </summary>
 		public static Vector<double> ToVector(this IEnumerable<double> collection) => Vector<double>.Build.DenseOfArray(collection.ToArray());
-		
+
 		/// <summary>
-		///     Convert this <paramref name="collection" /> to a <see cref="Vector" /> with components in <paramref name="unit"/>.
+		///     Convert this <paramref name="collection" /> to a <see cref="Vector" /> with components in <paramref name="unit" />.
 		/// </summary>
 		/// <param name="unit">The required unit to convert the components.</param>
-		public static Vector<double> ToVector<TQuantity, TUnit>(this IEnumerable<TQuantity> collection, TUnit unit) 
+		public static Vector<double> ToVector<TQuantity, TUnit>(this IEnumerable<TQuantity> collection, TUnit unit)
 			where TQuantity : IQuantity<TUnit>
 			where TUnit : Enum =>
 			collection
 				.GetValues(unit)
 				.ToVector();
-		
-		/// <inheritdoc cref="ToVector{TQuantity, TUnit}(IEnumerable{TQuantity}, TUnit)"/>
+
+		/// <inheritdoc cref="ToVector{TQuantity, TUnit}(IEnumerable{TQuantity}, TUnit)" />
 		/// <remarks>
-		///		This uses the unit of the vector's first component.
+		///     This uses the unit of the vector's first component.
 		/// </remarks>
-		public static Vector<double> ToVector<TQuantity, TUnit>(this IEnumerable<TQuantity> collection) 
+		public static Vector<double> ToVector<TQuantity, TUnit>(this IEnumerable<TQuantity> collection)
 			where TQuantity : IQuantity<TUnit>
 			where TUnit : Enum =>
 			collection
 				.ToVector(collection.First().Unit);
-		
-		
+
 		#endregion
 
 	}

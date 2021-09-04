@@ -91,8 +91,6 @@ namespace andrefmello91.Extensions
 	public interface IEquatable<in T1, in T2>
 	{
 
-		#region Methods
-
 		#region Object override
 
 		/// <inheritdoc cref="IEquatable{T}.Equals(T)" />
@@ -100,8 +98,6 @@ namespace andrefmello91.Extensions
 
 		/// <inheritdoc cref="IEquatable{T}.Equals(T)" />
 		bool Equals(T2 other);
-
-		#endregion
 
 		#endregion
 
