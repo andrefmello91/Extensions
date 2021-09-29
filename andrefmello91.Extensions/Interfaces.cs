@@ -1,4 +1,5 @@
 ﻿using System;
+using MathNet.Numerics.LinearAlgebra;
 using UnitsNet.Units;
 
 namespace andrefmello91.Extensions
@@ -114,6 +115,46 @@ namespace andrefmello91.Extensions
 
 		/// <inheritdoc cref="ICloneable.Clone" />
 		T Clone();
+
+		#endregion
+
+	}
+
+	/// <summary>
+	///     Interface for transforming objects into vectors.
+	/// </summary>
+	public interface IVectorTransformable
+	{
+
+		#region Methods
+
+		/// <summary>
+		///     Transform this object into a vector.
+		/// </summary>
+		/// <returns>
+		///     <see cref="Vector{T}" />
+		/// </returns>
+		Vector<double> AsVector();
+
+		#endregion
+
+	}
+
+	/// <summary>
+	///     Interface for transforming objects into matrices.
+	/// </summary>
+	public interface IMatrixTransformable
+	{
+
+		#region Methods
+
+		/// <summary>
+		///     Transform this object into a Matrix.
+		/// </summary>
+		/// <returns>
+		///     <see cref="Matrix{T}" />
+		/// </returns>
+		Matrix<double> AsMatrix();
 
 		#endregion
 
