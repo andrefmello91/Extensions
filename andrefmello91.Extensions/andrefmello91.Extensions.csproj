@@ -4,7 +4,7 @@
         <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
-        <Version>1.0.9</Version>
+        <Version>1.1.0</Version>
         <Authors>andrefmello91</Authors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -19,7 +19,7 @@
         <PackageId>andrefmello91.Extensions</PackageId>
         <PackageDescription>Personal extensions.</PackageDescription>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageReleaseNotes>Added some unit and collection extensions.</PackageReleaseNotes>
+        <PackageReleaseNotes>Matrix and vector conversions.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
