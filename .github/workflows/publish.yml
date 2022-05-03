@@ -17,12 +17,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
-    - name: PublishGitHub  
-      uses: brandedoutcast/publish-nuget@v2.5.5  
-      with:   
-       PROJECT_FILE_PATH: andrefmello91.Extensions/andrefmello91.Extensions.csproj
-       NUGET_SOURCE: https://nuget.pkg.github.com/andrefmello91
-       NUGET_KEY: ${{secrets.NUGET_GITHUB_KEY}}
     - name: Publish  
       uses: brandedoutcast/publish-nuget@v2.5.5  
       with:   
